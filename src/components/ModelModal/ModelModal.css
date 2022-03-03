@@ -1,0 +1,11 @@
+.model-modal {
+  min-width: 640px;
+  min-height: 600px;
+}
+
+.ModelVideoGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 1rem;
+  margin: 1rem;
+}
