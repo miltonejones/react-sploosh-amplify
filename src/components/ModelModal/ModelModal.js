@@ -2,11 +2,13 @@ import * as React from 'react';
 
 import DialogTitle from '@mui/material/DialogTitle';
 import Dialog from '@mui/material/Dialog';
-import { Pagination } from '@mui/material';
+import Avatar from '@mui/material/Avatar';
+import Stack from '@mui/material/Stack';
+import Typography from '@mui/material/Typography';
 
 import { getModel } from '../../connector/DbConnector';
 import useComponentState from '../../hooks/useComponentState';
-import { VideoCard } from '../';
+import { VideoCard, StyledPagination, Flex } from '../';
 import './ModelModal.css';
 
 export default function ModelModal(props) {
@@ -38,6 +40,7 @@ export default function ModelModal(props) {
   if (!response) return <i />;
 
   const { model: star, videos } = response;
+  if (!videos) return 'No videos found for this artist.';
   const totalPages = Math.ceil(videos.count / 30);
   const model = star[0];
   return (
@@ -46,14 +49,19 @@ export default function ModelModal(props) {
       onClose={handleClose}
       open={open}
     >
-      <DialogTitle>{model.name}</DialogTitle>
-      <Pagination
-        showFirstButton
-        showLastButton
-        shape="rounded"
-        count={totalPages}
+      <DialogTitle>
+        <Flex mr={2}>
+          {!!model.image && <Avatar src={model.image} alt={model.name} />}
+          <Stack ml={2}>
+            <Typography variant="body1">{model.name}</Typography>
+            <Typography variant="caption">{videos.count} videos</Typography>
+          </Stack>
+        </Flex>
+      </DialogTitle>
+      <StyledPagination
+        totalPages={totalPages}
         page={page}
-        onChange={handleChange}
+        handleChange={handleChange}
       />
       <div className="ModelVideoGrid">
         {videos.records?.map((video) => (

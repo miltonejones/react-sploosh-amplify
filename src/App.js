@@ -1,14 +1,20 @@
 import React from 'react';
 import './style.css';
 import useComponentState from './hooks/useComponentState';
-import { getVideos, getVideo } from './connector/DbConnector';
-import { VideoCard, ModelModal, useModelModal, Flex } from './components';
-import { Pagination, Box } from '@mui/material';
+import { getVideos, getVideo, findVideos } from './connector/DbConnector';
+import {
+  VideoCard,
+  ModelModal,
+  useModelModal,
+  Flex,
+  StyledPagination,
+} from './components';
+import { TextField, Box, Button } from '@mui/material';
 
 export default function App() {
   const { state, setState } = useComponentState({ page: 1, response: {} });
   const { modelModalState, showDialog } = useModelModal();
-  const { page, response } = state;
+  const { page, response, param } = state;
 
   const handleChange = (event, value) => {
     loadVideos(value);
@@ -16,6 +22,15 @@ export default function App() {
   const loadVideos = React.useCallback(
     async (p) => {
       const items = await getVideos(p);
+      console.log({ items });
+      setState('response', items);
+      setState('page', p);
+    },
+    [page]
+  );
+  const searchVideos = React.useCallback(
+    async (str, p) => {
+      const items = await findVideos(str, p);
       console.log({ items });
       setState('response', items);
       setState('page', p);
@@ -37,40 +52,55 @@ export default function App() {
   const totalPages = Math.ceil(count / 30);
 
   return (
-    <Box className="App">
-      <Flex>
-        <Pagination
-          showFirstButton
-          showLastButton
-          shape="rounded"
-          count={totalPages}
-          page={page}
-          siblingCount={4}
-          onChange={handleChange}
-        />
-      </Flex>
-      <div className="ThumbnailGrid">
-        {records?.map((video) => (
-          <VideoCard
-            key={video.ID}
-            video={video}
-            getModel={(q) => {
-              showDialog(q);
-            }}
-            onClick={(q) => loadVideo(q.ID)}
+    <Box>
+      <Box className="head">
+        <Flex sx={{ textAlign: 'left' }}>
+          <TextField
+            size="small"
+            label="Search"
+            placeholder="Enter search params"
+            value={param}
+            onKeyUp={e => e.keyCode === 13 && searchVideos(param, 1)}
+            onChange={(e) => setState('param', e.target.value)}
           />
-        ))}
-      </div>
-      <Flex>
-        <Pagination
-          showFirstButton
-          showLastButton
-          shape="rounded"
-          count={totalPages}
-          page={page}
-          onChange={handleChange}
-        />
-      </Flex>
+
+          <Button onClick={() => searchVideos(param, 1)}>search</Button>
+        </Flex>
+      </Box>
+      <Box className="head">
+        <Flex>
+          <StyledPagination
+            totalPages={totalPages}
+            page={page}
+            handleChange={handleChange}
+          />
+        </Flex>
+      </Box>
+
+      <Box className="App">
+        <div className="ThumbnailGrid">
+          {records?.map((video) => (
+            <VideoCard
+              key={video.ID}
+              video={video}
+              getModel={(q) => {
+                showDialog(q);
+              }}
+              onClick={(q) => loadVideo(q.ID)}
+            />
+          ))}
+        </div>
+      </Box>
+
+      <Box className="head">
+        <Flex>
+          <StyledPagination
+            totalPages={totalPages}
+            page={page}
+            handleChange={handleChange}
+          />
+        </Flex>
+      </Box>
       <ModelModal {...modelModalState} />
     </Box>
   );

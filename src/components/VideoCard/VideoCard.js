@@ -102,7 +102,7 @@ export default function VideoCard({ video, onClick, getModel, small }) {
                 {video.domain}
               </Typography>
               <Spacer />
-              studio
+              {video.studio}
             </Flex>
           </CardContent>
         )}

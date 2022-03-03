@@ -16,3 +16,8 @@ export const getModel = async (id, page = 1) => {
   const response = await fetch(API_ENDPOINT + `/model/${id}/${page}`);
   return await response.json();
 };
+
+export const findVideos = async (param, page) => {
+  const response = await fetch(API_ENDPOINT + `/find/${param}/${page}`);
+  return await response.json();
+};

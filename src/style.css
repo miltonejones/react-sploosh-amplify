@@ -10,6 +10,12 @@ p {
   align-items: center;
 }
 
+.head {
+  width: calc(100vw - 48px);
+  display: flex;
+  padding: 0 24px;
+}
+
 .ThumbnailGrid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
