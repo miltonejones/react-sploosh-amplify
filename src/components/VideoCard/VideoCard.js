@@ -73,15 +73,16 @@ export default function VideoCard({ video, onClick, getModel, small }) {
             </Flex>
             {!!video.models.length && (
               <>
-                <Typography
-                  onClick={() => setShowModels(!showModels)}
-                  variant="caption"
-                  color="text.secondary"
-                >
+                <Typography variant="caption" color="text.secondary">
                   <b>Models:</b>{' '}
                   <u onClick={() => getModel(video.models[0].ID)}>
                     {video.models[0].Name}
-                  </u>
+                  </u>{' '}
+                  {video.models.length > 1 && (
+                    <u onClick={() => setShowModels(!showModels)}>
+                      and {video.models.length - 1} more...
+                    </u>
+                  )}
                 </Typography>
                 {video.models.length > 1 && (
                   <Collapse in={showModels}>
