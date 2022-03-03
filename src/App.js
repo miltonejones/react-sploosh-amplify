@@ -39,7 +39,15 @@ export default function App() {
   return (
     <Box className="App">
       <Flex>
-        <Pagination count={totalPages} page={page} onChange={handleChange} />
+        <Pagination
+          showFirstButton
+          showLastButton
+          shape="rounded"
+          count={totalPages}
+          page={page}
+          siblingCount={4}
+          onChange={handleChange}
+        />
       </Flex>
       <div className="ThumbnailGrid">
         {records?.map((video) => (
@@ -54,7 +62,14 @@ export default function App() {
         ))}
       </div>
       <Flex>
-        <Pagination count={totalPages} page={page} onChange={handleChange} />
+        <Pagination
+          showFirstButton
+          showLastButton
+          shape="rounded"
+          count={totalPages}
+          page={page}
+          onChange={handleChange}
+        />
       </Flex>
       <ModelModal {...modelModalState} />
     </Box>

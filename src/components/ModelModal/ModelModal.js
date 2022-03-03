@@ -47,7 +47,14 @@ export default function ModelModal(props) {
       open={open}
     >
       <DialogTitle>{model.name}</DialogTitle>
-      <Pagination count={totalPages} page={page} onChange={handleChange} />
+      <Pagination
+        showFirstButton
+        showLastButton
+        shape="rounded"
+        count={totalPages}
+        page={page}
+        onChange={handleChange}
+      />
       <div className="ModelVideoGrid">
         {videos.records?.map((video) => (
           <VideoCard small key={video.ID} video={video} />

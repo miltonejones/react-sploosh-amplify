@@ -5,6 +5,7 @@ import CardMedia from '@mui/material/CardMedia';
 import Typography from '@mui/material/Typography';
 import { Avatar, Box } from '@mui/material';
 import { CardActionArea, Collapse } from '@mui/material';
+import Tooltip from '@mui/material/Tooltip';
 import { RegionMenu } from '../';
 import { WindowManagerService } from '../../services/WindowManager';
 
@@ -84,7 +85,14 @@ export default function VideoCard({ video, onClick, getModel, small }) {
                 </Typography>
                 {video.models.length > 1 && (
                   <Collapse in={showModels}>
-                    {video.models.map((f) => f.Name).join(', ')}
+                    {video.models.map((f, i) => (
+                      <>
+                        <u key={f.ID} onClick={() => getModel(f.ID)}>
+                          {f.Name}
+                        </u>
+                        {i < video.models.length - 1 && <i>, </i>}
+                      </>
+                    ))}
                   </Collapse>
                 )}
               </>
@@ -117,5 +125,9 @@ export const Spacer = () => <Box sx={{ flexGrow: 1 }} />;
 export const Shorten = ({ children, limit = 40 }) => {
   const text = children.toString();
   if (text.length <= limit) return text;
-  return text.substr(0, limit) + '...';
+  return (
+    <Tooltip title={text}>
+      <span>{text.substr(0, limit) + '...'}</span>
+    </Tooltip>
+  );
 };
