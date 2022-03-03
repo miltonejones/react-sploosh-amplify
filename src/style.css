@@ -1,3 +1,23 @@
-h1, p {
+h1,
+p {
   font-family: Lato;
+}
+
+.ThumbnailGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  max-width: 1360px;
+  padding-bottom: 20px;
+  gap: 1rem;
+}
+
+.app-region-menu {
+  position: absolute;
+  top: -200px;
+  left: 0;
+  transition: top 0.2s ease-in;
+}
+
+.app-region-menu.open {
+  top: 0;
 }
