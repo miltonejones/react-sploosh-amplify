@@ -28,8 +28,10 @@ class WindowManagerService$ {
   }
   focus() {
     this.launched
-      .sort((a, b) => (a.index < b.index ? 1 : -1))
-      .map((app) => app.window?.focus());
+      // .sort((a, b) => (a.index < b.index ? 1 : -1))
+      .map((app) => { 
+        app.window && app.window.focus()
+      });
   }
   launch(video, index = 0) {
     this.launched.push({

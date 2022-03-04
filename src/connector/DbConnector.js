@@ -7,6 +7,11 @@ export const getVideos = async (page) => {
   return await response.json();
 };
 
+export const getFavorites = async (page) => {
+  const response = await fetch(API_ENDPOINT + `/favorite/${page}`);
+  return await response.json();
+};
+
 export const getVideo = async (id) => {
   const response = await fetch(API_ENDPOINT + `/video/${id}`);
   return await response.json();
@@ -29,5 +34,15 @@ export const addVideo = async (URL) => {
     body: JSON.stringify({ URL}),
   };
   const response = await fetch(API_ENDPOINT + '/add-video', requestOptions);
+  return await response.json();
+};
+
+export const getVideoKeys = async (Keys) => {
+  const requestOptions = {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ Keys}),
+  };
+  const response = await fetch(API_ENDPOINT + '/video-keys', requestOptions);
   return await response.json();
 };

@@ -5,7 +5,7 @@ import InputAdornment from '@mui/material/InputAdornment';
 import { VideoCollection, Flex, Spacer, SearchDrawer } from './components';
 import { TextField, Box , Tab, Tabs, Avatar, Collapse, IconButton } from '@mui/material';
 import { Search, Sync, Close, Menu } from '@mui/icons-material';
-import { BrowserRouter, useParams ,Routes, Route, useNavigate} from "react-router-dom";
+import { BrowserRouter, useParams ,Routes, Route, useNavigate, Link} from "react-router-dom";
 
 
 function VideoGrid (props) {
@@ -21,8 +21,10 @@ function VideoGrid (props) {
     searches,
     locate,
     searchDrawerOpen,
+    pageNames,
+    pageIndex,
     removeTab
-  } = useApp();
+  } = useApp(props);
   const tabValue = searches?.map(f => f.param).indexOf(queryParam) + 1;
   const handleChange = (event, newValue) => {
     if (newValue === 0) navigate(`/video/1`)  
@@ -43,9 +45,14 @@ function VideoGrid (props) {
           <IconButton onClick={() => setState('searchDrawerOpen', !searchDrawerOpen)}>
             <Menu />
           </IconButton>
-          <Avatar onClick={() => navigate('/')} sx={{ml: 4, mr: 2}} 
+          <Avatar onClick={() => navigate('/')} sx={{ml: 4, mr: 4}} 
               src="https://s3.amazonaws.com/sploosh.me.uk/assets/sploosh.png" 
               alt="logo" />
+              
+              
+              {pageNames.map((p, i) => <Link className={pageIndex === i ? "link on" : "link"} key={p.href} to={p.href}>{p.label}</Link>)}
+
+
           <Spacer />
           <TextField  
            InputProps={{
@@ -87,22 +94,24 @@ function VideoGrid (props) {
 export default function App() {
   return <BrowserRouter>
   <Routes>
-    <Route path="/" element={<VideoGrid />} />
-    <Route path="/video/:videoPageNum" element={<VideoGrid />} />
-    <Route path="/search/:queryParam/:videoPageNum" element={<VideoGrid />} />
+    <Route path="/" element={<VideoGrid  pageIndex={0}/>} />
+    <Route path="/recent/:videoPageNum" element={<VideoGrid pageIndex={2} queryType="recent" />} />
+    <Route path="/heart/:videoPageNum" element={<VideoGrid pageIndex={1} queryType="heart" />} />
+    <Route path="/video/:videoPageNum" element={<VideoGrid pageIndex={0} />} />
+    <Route path="/search/:queryParam/:videoPageNum" element={<VideoGrid pageIndex={0} />} />
   </Routes>
 </BrowserRouter>
 }
 
 
-function useApp () {
+function useApp ({ queryType, pageIndex }) {
   let navigate = useNavigate();
   const { videoPageNum = 1, queryParam } = useParams();
   const gridType = !queryParam ? 'video' : 'search';
   const { state, setState } = useComponentState({
     page: videoPageNum,
     param: queryParam,
-    collectionType: gridType,
+    collectionType: queryType || gridType,
     busy: false, 
     searches: []
   });
@@ -134,7 +143,7 @@ function useApp () {
 
   const args = {
     setBusy: b => setState('busy', b),
-    collectionType: gridType,
+    collectionType: queryType || gridType,
     searchParam: queryParam,
     pageNum: parseInt(videoPageNum),
     onChange: locate,
@@ -143,6 +152,12 @@ function useApp () {
 
   const SearchIcon = busy ? Sync : Search;
   const iconClass = busy ? 'spin' : '';
+  const pageNames = [
+    {label:'videos',href:'/'}, 
+    {label:'favorites',href:'/heart/1'}, 
+    {label:'recently seen',href:'/recent/1'}, 
+    {label:'models',href:'/'}, 
+   ]
   return {
     SearchIcon,
     iconClass,
@@ -154,6 +169,8 @@ function useApp () {
     queryParam,
     removeTab,
     locate,
+    pageNames,
+    pageIndex,
     ...state
   }
 }

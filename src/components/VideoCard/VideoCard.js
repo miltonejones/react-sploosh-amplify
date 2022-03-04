@@ -39,13 +39,15 @@ export default function VideoCard({ video, onClick, onSearch, getModel, small })
   return (
     <Card sx={{ maxWidth: 345, opacity }} elevation={video.favorite ? 6 : 1}>
       <CardActionArea>
-        <CardMedia
-          component="img"
-          height={height}
-          image={src}
-          alt={video.title}
-          onClick={() => setOpen(!open)}
-        />
+        <Tooltip title={video.title}> 
+            <CardMedia
+              component="img"
+              height={height}
+              image={src}
+              alt={video.title}
+              onClick={() => setOpen(!open)}
+            />
+        </Tooltip>
         <RegionMenu
           {...menuProps}
           click={(i) => {
@@ -82,7 +84,7 @@ export default function VideoCard({ video, onClick, onSearch, getModel, small })
                 ml={!!video.models.length ? 2 : 0}
                 variant="body2"
                 color="text.secondary"
-                onClick={() => onClick(video)}
+                onClick={() => onClick && onClick(video)}
                 classes={{root: video.favorite ? "favorite" : ""}}
               >
                 <Shorten limit={!!video.models.length ? 35 : 50}>
