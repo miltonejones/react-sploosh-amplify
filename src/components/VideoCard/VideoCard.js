@@ -87,12 +87,12 @@ export default function VideoCard({ video, onClick, getModel, small }) {
                 {video.models.length > 1 && (
                   <Collapse in={showModels}>
                     {video.models.map((f, i) => (
-                      <>
-                        <u key={f.ID} onClick={() => getModel(f.ID)}>
+                      <span key={f.ID} >
+                        <u onClick={() => getModel(f.ID)}>
                           {f.Name}
                         </u>
                         {i < video.models.length - 1 && <i>, </i>}
-                      </>
+                      </span>
                     ))}
                   </Collapse>
                 )}

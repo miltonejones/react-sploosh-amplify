@@ -1,0 +1,6 @@
+.VideoCollection {
+    padding: 0;
+    width: 100vw;
+    /* outline: solid 2px red; */
+    outline-offset: -4px;
+}

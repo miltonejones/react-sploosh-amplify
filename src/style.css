@@ -1,6 +1,5 @@
-h1,
-p {
-  font-family: Lato;
+body {
+  margin: 0;
 }
 
 .App {
@@ -19,7 +18,9 @@ p {
 .ThumbnailGrid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  max-width: 1360px;
+  /* max-width: 1360px; */
+  width: calc(100vw - 60px);
+  /* border: solid 4px green; */
   padding-bottom: 20px;
   gap: 1rem;
 }
@@ -34,3 +35,17 @@ p {
 .app-region-menu.open {
   top: 0;
 }
+
+.spin {
+  animation: spin 0.4s infinite linear;
+}
+
+@keyframes spin {
+  from {
+      transform:rotate(0deg);
+  }
+  to {
+      transform:rotate(360deg);
+  }
+}
+

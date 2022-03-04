@@ -7,13 +7,14 @@ export const StyledPagination = ({ totalPages, page, handleChange }) => {
   }
   return (
     <Pagination
+      sx={{p: 1}}
       color="primary"
       showFirstButton
       showLastButton
       shape="rounded"
       count={totalPages}
       page={page}
-      siblingCount={4}
+      siblingCount={2}
       onChange={handleChange}
     />
   );
