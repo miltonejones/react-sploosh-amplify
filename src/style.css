@@ -56,6 +56,11 @@ body {
   box-shadow: var(--card-shadow);
 }
 
+.model-image {
+  max-width: 120px;
+  height: auto;
+}
+
 @keyframes spin {
   from {
       transform:rotate(0deg);

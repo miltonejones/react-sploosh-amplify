@@ -95,7 +95,7 @@ export default function VideoCard({ video, onClick, onSearch, getModel, small })
                 <Typography variant="caption" color="text.secondary">
                   <b>Models:</b>{' '}
                   <u onClick={() => getModel(video.models[0].ID)}>
-                    {video.models[0].Name}
+                    <ModelName {...video.models[0]} /> 
                   </u>{' '}
                   {video.models.length > 1 && (
                     <b><u onClick={() => setShowModels(!showModels)}>
@@ -108,7 +108,7 @@ export default function VideoCard({ video, onClick, onSearch, getModel, small })
                     {video.models.map((f, i) => (
                       <span key={f.ID} >
                         <u onClick={() => getModel(f.ID)}>
-                          {f.Name}
+                          <ModelName {...f} />
                         </u>
                         {i < video.models.length - 1 && <i>, </i>}
                       </span>
@@ -132,6 +132,14 @@ export default function VideoCard({ video, onClick, onSearch, getModel, small })
       </CardActionArea>
     </Card>
   );
+}
+
+const ModelName = ({Name, image}) => {
+  if (!image) return Name;
+  return (
+    <Tooltip title={<img className="model-image" src={image} alt={Name} />}>
+      <span>{Name}</span>
+    </Tooltip>)
 }
 
 export const Flex = ({ children, ...props }) => (

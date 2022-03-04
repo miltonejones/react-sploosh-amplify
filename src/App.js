@@ -4,7 +4,7 @@ import useComponentState from './hooks/useComponentState';
 import InputAdornment from '@mui/material/InputAdornment';
 import { VideoCollection, Flex, Spacer } from './components';
 import { TextField, Box , Tab, Tabs, Avatar, Collapse } from '@mui/material';
-import { Search, Sync } from '@mui/icons-material';
+import { Search, Sync, Close } from '@mui/icons-material';
 import { BrowserRouter, useParams ,Routes, Route, useNavigate} from "react-router-dom";
 
 
@@ -31,8 +31,7 @@ function VideoGrid (props) {
     <Box className="App">
       <Box className="toolbar">
         <Flex sx={{ textAlign: 'left' }}>
-          <Avatar sx={{ml: 4, mr: 2}} src="http://sploosh.me.uk/assets/sploosh.png" alt="logo" />
-          {/* {JSON.stringify(searches)} */}
+          <Avatar onClick={() => navigate('/')} sx={{ml: 4, mr: 2}} src="https://s3.amazonaws.com/sploosh.me.uk/assets/sploosh.png" alt="logo" />
           <Spacer />
           <TextField  
            InputProps={{
@@ -56,6 +55,7 @@ function VideoGrid (props) {
         <Tabs onChange={handleChange} value={tabValue}>
           <Tab label="All Videos"/>
           {searches?.map (s => <Tab label={s.param} key={s.param} />)} 
+          <Tab icon={<Close />} />
         </Tabs>
       </Collapse>
 
