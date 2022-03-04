@@ -36,6 +36,8 @@ function VideoGrid (props) {
 
   return (
     <Box className="App">
+
+      {/* toolbar */}
       <Box className="toolbar">
         <Flex sx={{ textAlign: 'left' }}>
           <IconButton onClick={() => setState('searchDrawerOpen', !searchDrawerOpen)}>
@@ -62,7 +64,8 @@ function VideoGrid (props) {
           />
         </Flex>
       </Box>
-
+      
+      {/* search tabs */}
       <Collapse className="head" in={!!searches.length}>
         <Tabs onChange={handleChange} value={tabValue}>
           <Tab label="All Videos"/>
@@ -71,6 +74,7 @@ function VideoGrid (props) {
         </Tabs>
       </Collapse>
 
+      {/* video grid */}
       <VideoCollection {...args} />
       <SearchDrawer onClick={locate} onClose={() => setState('searchDrawerOpen', false)} open={searchDrawerOpen} />
     </Box>

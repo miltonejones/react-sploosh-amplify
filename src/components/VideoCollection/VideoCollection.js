@@ -1,5 +1,6 @@
 import React from 'react';
 import useComponentState from '../../hooks/useComponentState';
+import { VideoPersistService } from '../../services/VideoPersist'
 import { getVideos, getVideo, findVideos, addVideo } from '../../connector/DbConnector';
 import {
   VideoCard,
@@ -7,7 +8,9 @@ import {
   useModelModal,
   Flex,
   StyledPagination,
-  Spacer
+  Spacer, 
+  SystemDialog, 
+  useSystemDialog 
 } from '../';
 import { TextField, Box, Button, IconButton } from '@mui/material';
 import { Sync, Add } from '@mui/icons-material';
@@ -25,7 +28,9 @@ export default function VideoCollection(props) {
     searchParam, 
     searchKey,
     onChange ,
-    refreshList
+    refreshList,
+    systemDialogState, 
+    Prompt
   } =
     useVideoCollection(props);
   const { count, records } = response;
@@ -35,8 +40,10 @@ export default function VideoCollection(props) {
   const totalPages = Math.ceil(count / 30);
 
   const add = async () => {
-    const URL = prompt ('Enter video URL');
-    if (!URL) return;
+    const URL = await Prompt('Type or paste video URL:', false, 'Add Video')
+  
+    // const URL = prompt ('Enter video URL');
+    if (!URL) return; 
     const id = await addVideo(URL);
     // alert (id + ' was added');
     refreshList();
@@ -87,6 +94,7 @@ export default function VideoCollection(props) {
         </Flex>
       </Box>
       <ModelModal {...modelModalState} />
+      <SystemDialog {...systemDialogState}/>
     </Box>
   );
 }
@@ -107,6 +115,7 @@ function useVideoCollection({
     searchKey: `${collectionType}-${searchParam}-${pageNum}`
   });
   const { modelModalState, showDialog } = useModelModal();
+  const { systemDialogState, Prompt } = useSystemDialog()
   const { page, response, busy, type, param, searchKey, loaded } = state;
   
   const createKey = React.useCallback(
@@ -189,6 +198,8 @@ function useVideoCollection({
     setBusy,
     searchKey,
     onChange,
-    refreshList
+    refreshList,
+    systemDialogState, 
+    Prompt
   };
 }

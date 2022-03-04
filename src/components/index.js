@@ -3,7 +3,7 @@ import RegionMenu from './RegionMenu/RegionMenu';
 import ModelModal, { useModelModal } from './ModelModal/ModelModal';
 import VideoCollection from './VideoCollection/VideoCollection';
 import SearchDrawer from './SearchDrawer/SearchDrawer';
-import { StyledPagination } from './Control/Control';
+import { StyledPagination, SystemDialog, useSystemDialog } from './Control/Control';
 
 export {
   VideoCard,
@@ -15,5 +15,7 @@ export {
   Shorten,
   StyledPagination,
   VideoCollection,
-  SearchDrawer
+  SearchDrawer, 
+  SystemDialog, 
+  useSystemDialog
 };
