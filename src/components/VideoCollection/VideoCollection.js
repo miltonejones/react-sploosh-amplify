@@ -9,7 +9,8 @@ import {
   addVideo, 
   getVideoKeys,
   getFavorites,
-  toggleVideoFavorite 
+  toggleVideoFavorite ,
+  deleteVideo
 } from '../../connector/DbConnector';
 import {
   VideoCard,
@@ -41,7 +42,8 @@ export default function VideoCollection(props) {
     systemDialogState, 
     collectionType,
     Prompt,
-    onHeart
+    onHeart,
+    onDrop
   } =
     useVideoCollection(props);
   const { count, records } = response;
@@ -95,6 +97,7 @@ export default function VideoCollection(props) {
                 showDialog(q);
               }}
               onHeart={onHeart}
+              onDrop={onDrop}
               onSearch={onChange}
             />
           ))}
@@ -131,7 +134,7 @@ function useVideoCollection({
     searchKey: `${collectionType}-${searchParam}-${pageNum}`
   });
   const { modelModalState, showDialog } = useModelModal();
-  const { systemDialogState, Prompt } = useSystemDialog()
+  const { systemDialogState, Prompt, Confirm } = useSystemDialog()
   const { page, response, busy, type, param, searchKey, loaded } = state;
   
   const createKey = React.useCallback(
@@ -227,9 +230,16 @@ function useVideoCollection({
     },
     [collectionType]
   );
-
+  
   const onHeart = async (ID) => { 
     const res = await toggleVideoFavorite(ID);
+    refreshList()
+  }
+
+  const onDrop  = async (ID, title="this video") => { 
+    const yes = await Confirm('Are you sure you want to delete ' + title + '?')
+    if (!yes) return alert ('Well OK then!')
+    const res = await deleteVideo(ID);
     refreshList()
   }
 
@@ -264,6 +274,7 @@ function useVideoCollection({
     systemDialogState, 
     collectionType,
     Prompt,
-    onHeart
+    onHeart,
+    onDrop
   };
 }

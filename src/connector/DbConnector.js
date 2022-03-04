@@ -17,6 +17,15 @@ export const getVideo = async (id) => {
   return await response.json();
 };
 
+export const deleteVideo = async (id) => {
+  const requestOptions = {
+    method: "DELETE",
+    headers: { "Content-Type": "application/json" } 
+  };
+  const response = await fetch(API_ENDPOINT + '/video/' + id, requestOptions);
+  return await response.json();
+};
+
 export const getModel = async (id, page = 1) => {
   const response = await fetch(API_ENDPOINT + `/model/${id}/${page}`);
   return await response.json();

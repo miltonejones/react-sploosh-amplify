@@ -105,7 +105,24 @@ export function useSystemDialog() {
     });
   });
 
-  return { systemDialogState, Prompt };
+  const Confirm = (message, title) => new Promise(yes => {
+    setState({
+      open: true,
+      message, 
+      title,
+      onYes: v => {
+        yes(v);
+        setState({open: false})
+      },
+      onNo: () => {
+        yes(false)
+        setState({open: false})
+      }, 
+      onClose: () => setState({ open: false }),
+    });
+  });
+
+  return { systemDialogState, Prompt, Confirm };
 }
 
 
