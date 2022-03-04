@@ -12,7 +12,7 @@ import { Favorite, DeleteForever, Launch, MoreVert } from '@mui/icons-material';
 
 const ERR_IMAGE = 'https://s3.amazonaws.com/sploosh.me.uk/assets/XXX.jpg';
 
-export default function VideoCard({ video, onClick, onSearch, getModel, small }) {
+export default function VideoCard({ video, onClick, onSearch, getModel, small, onHeart }) {
   const [open, setOpen] = React.useState(false);
   const [src, setSrc] = React.useState(ERR_IMAGE);
   const [showModels, setShowModels] = React.useState(false);
@@ -59,7 +59,7 @@ export default function VideoCard({ video, onClick, onSearch, getModel, small })
       <Collapse in={showMenu}>
         
         <Flex style={{padding:12}}>
-          <IconButton>
+          <IconButton onClick={() => onHeart(video.ID)}>
             <Favorite style={{ color: video.favorite ? 'red' : 'gray' }} /> 
           </IconButton>
           <IconButton>

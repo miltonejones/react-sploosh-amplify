@@ -1,4 +1,5 @@
 import { WINDOW_REGIONS } from '../constants';
+import { VideoPersistService } from './VideoPersist'
 
 class WindowManagerService$ {
   launched = [];
@@ -40,7 +41,7 @@ class WindowManagerService$ {
       window: this.region(video, index),
     });
     this.index++;
-    // VideoPersistService.add(video);
+     VideoPersistService.add(video);
     setTimeout(() => this.focus(), 99);
   }
   visited(video) {

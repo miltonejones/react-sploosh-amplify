@@ -2,7 +2,15 @@ import React from 'react';
 import useComponentState from '../../hooks/useComponentState';
 import { VideoPersistService } from '../../services/VideoPersist'
 import { WindowManagerService } from '../../services/WindowManager';
-import { getVideos, getVideo, findVideos, addVideo, getVideoKeys, getFavorites } from '../../connector/DbConnector';
+import { 
+  getVideos, 
+  getVideo, 
+  findVideos, 
+  addVideo, 
+  getVideoKeys,
+  getFavorites,
+  toggleVideoFavorite 
+} from '../../connector/DbConnector';
 import {
   VideoCard,
   ModelModal,
@@ -32,7 +40,8 @@ export default function VideoCollection(props) {
     refreshList,
     systemDialogState, 
     collectionType,
-    Prompt
+    Prompt,
+    onHeart
   } =
     useVideoCollection(props);
   const { count, records } = response;
@@ -64,7 +73,7 @@ export default function VideoCollection(props) {
           />
           <Spacer />
           
-    {WindowManagerService.launched.length &&  
+    {!!WindowManagerService.launched.length &&  
         ( <IconButton onClick={() => WindowManagerService.focus()}>
             <VideoLabel />
           </IconButton>)}
@@ -85,6 +94,7 @@ export default function VideoCollection(props) {
               getModel={(q) => {
                 showDialog(q);
               }}
+              onHeart={onHeart}
               onSearch={onChange}
             />
           ))}
@@ -218,6 +228,11 @@ function useVideoCollection({
     [collectionType]
   );
 
+  const onHeart = async (ID) => { 
+    const res = await toggleVideoFavorite(ID);
+    refreshList()
+  }
+
   const refreshList = React.useCallback(() => {
     load(page, collectionType, param);
   }, [page, collectionType, param])
@@ -248,6 +263,7 @@ function useVideoCollection({
     refreshList,
     systemDialogState, 
     collectionType,
-    Prompt
+    Prompt,
+    onHeart
   };
 }

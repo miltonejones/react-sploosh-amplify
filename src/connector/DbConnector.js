@@ -37,6 +37,16 @@ export const addVideo = async (URL) => {
   return await response.json();
 };
 
+export const toggleVideoFavorite = async (ID) => {
+  const requestOptions = {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ ID }),
+  };
+  const response = await fetch(API_ENDPOINT + '/toggle-video-heart', requestOptions );
+  return await response.json();
+};
+
 export const getVideoKeys = async (Keys) => {
   const requestOptions = {
     method: "PUT",
