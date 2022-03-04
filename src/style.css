@@ -61,6 +61,10 @@ body {
   height: auto;
 }
 
+.maxWidth {
+  max-width: 25vw;
+}
+
 @keyframes spin {
   from {
       transform:rotate(0deg);

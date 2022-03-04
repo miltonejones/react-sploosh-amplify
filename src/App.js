@@ -2,9 +2,9 @@ import React from 'react';
 import './style.css';
 import useComponentState from './hooks/useComponentState';
 import InputAdornment from '@mui/material/InputAdornment';
-import { VideoCollection, Flex, Spacer } from './components';
-import { TextField, Box , Tab, Tabs, Avatar, Collapse } from '@mui/material';
-import { Search, Sync, Close } from '@mui/icons-material';
+import { VideoCollection, Flex, Spacer, SearchDrawer } from './components';
+import { TextField, Box , Tab, Tabs, Avatar, Collapse, IconButton } from '@mui/material';
+import { Search, Sync, Close, Menu } from '@mui/icons-material';
 import { BrowserRouter, useParams ,Routes, Route, useNavigate} from "react-router-dom";
 
 
@@ -18,11 +18,19 @@ function VideoGrid (props) {
     args,
     navigate,
     queryParam,
-    searches
+    searches,
+    locate,
+    searchDrawerOpen,
+    removeTab
   } = useApp();
   const tabValue = searches?.map(f => f.param).indexOf(queryParam) + 1;
   const handleChange = (event, newValue) => {
     if (newValue === 0) navigate(`/video/1`)  
+    if (newValue === searches.length + 1) {
+      // alert ([newValue, tabValue])
+      const doomed = searches[tabValue - 1].param;
+      return removeTab(doomed)
+    }
     const s = searches[newValue - 1];
     navigate(`/search/${s.param}/1`)  
   };
@@ -31,6 +39,9 @@ function VideoGrid (props) {
     <Box className="App">
       <Box className="toolbar">
         <Flex sx={{ textAlign: 'left' }}>
+          <IconButton onClick={() => setState('searchDrawerOpen', !searchDrawerOpen)}>
+            <Menu />
+          </IconButton>
           <Avatar onClick={() => navigate('/')} sx={{ml: 4, mr: 2}} src="https://s3.amazonaws.com/sploosh.me.uk/assets/sploosh.png" alt="logo" />
           <Spacer />
           <TextField  
@@ -60,6 +71,7 @@ function VideoGrid (props) {
       </Collapse>
 
       <VideoCollection {...args} />
+      <SearchDrawer onClick={locate} onClose={() => setState('searchDrawerOpen', false)} open={searchDrawerOpen} />
     </Box>
   );
 
@@ -96,6 +108,13 @@ function useApp () {
   // }, [queryParam, param])
 
   const prefix = !queryParam ? '' : `/${queryParam}`
+  const removeTab = (p) => {
+    const tabs = searches.filter (t => t.param !== p) 
+    setState('param', null)
+    setState('searches', tabs)
+    navigate(`/`) 
+  };
+
   const locate = (p) => {
     const tabs = searches.find (t => t.param === p)
       ? searches 
@@ -132,6 +151,8 @@ function useApp () {
     searches,
     navigate,
     queryParam,
+    removeTab,
+    locate,
     ...state
   }
 }
