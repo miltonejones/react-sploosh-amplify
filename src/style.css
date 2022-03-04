@@ -56,6 +56,26 @@ body {
   box-shadow: var(--card-shadow);
 }
 
+.toolbar .link {
+  padding: 6px 12px;
+  text-decoration: none;
+  color: #333;
+  font-family: Roboto, 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+}
+
+.toolbar .link:hover { 
+  text-decoration: underline;
+  color: tomato;
+ }
+
+.toolbar .link.on {
+  margin: 0 12px; 
+  background-color: var(--color-primary);
+  color: white;
+  border-radius: 4px;
+  box-shadow: var(--card-shadow);
+}
+
 .model-image {
   max-width: 120px;
   height: auto;

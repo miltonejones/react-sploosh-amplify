@@ -1,4 +1,5 @@
 import { WINDOW_REGIONS } from '../constants';
+import { VideoPersistService } from './VideoPersist'
 
 class WindowManagerService$ {
   launched = [];
@@ -28,8 +29,10 @@ class WindowManagerService$ {
   }
   focus() {
     this.launched
-      .sort((a, b) => (a.index < b.index ? 1 : -1))
-      .map((app) => app.window?.focus());
+      // .sort((a, b) => (a.index < b.index ? 1 : -1))
+      .map((app) => { 
+        app.window && app.window.focus()
+      });
   }
   launch(video, index = 0) {
     this.launched.push({
@@ -38,7 +41,7 @@ class WindowManagerService$ {
       window: this.region(video, index),
     });
     this.index++;
-    // VideoPersistService.add(video);
+     VideoPersistService.add(video);
     setTimeout(() => this.focus(), 99);
   }
   visited(video) {

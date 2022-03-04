@@ -1,7 +1,16 @@
 import React from 'react';
 import useComponentState from '../../hooks/useComponentState';
 import { VideoPersistService } from '../../services/VideoPersist'
-import { getVideos, getVideo, findVideos, addVideo } from '../../connector/DbConnector';
+import { WindowManagerService } from '../../services/WindowManager';
+import { 
+  getVideos, 
+  getVideo, 
+  findVideos, 
+  addVideo, 
+  getVideoKeys,
+  getFavorites,
+  toggleVideoFavorite 
+} from '../../connector/DbConnector';
 import {
   VideoCard,
   ModelModal,
@@ -13,7 +22,7 @@ import {
   useSystemDialog 
 } from '../';
 import { TextField, Box, Button, IconButton } from '@mui/material';
-import { Sync, Add } from '@mui/icons-material';
+import { Sync, Add, VideoLabel } from '@mui/icons-material';
 import './VideoCollection.css';
 
 export default function VideoCollection(props) {
@@ -30,7 +39,9 @@ export default function VideoCollection(props) {
     onChange ,
     refreshList,
     systemDialogState, 
-    Prompt
+    collectionType,
+    Prompt,
+    onHeart
   } =
     useVideoCollection(props);
   const { count, records } = response;
@@ -47,8 +58,7 @@ export default function VideoCollection(props) {
     const id = await addVideo(URL);
     // alert (id + ' was added');
     refreshList();
-  }
-
+  } 
   return (
     <Box  className="VideoCollection">
       <Box className="head">
@@ -62,6 +72,11 @@ export default function VideoCollection(props) {
             handleChange={handleChange}
           />
           <Spacer />
+          
+    {!!WindowManagerService.launched.length &&  
+        ( <IconButton onClick={() => WindowManagerService.focus()}>
+            <VideoLabel />
+          </IconButton>)}
           <IconButton onClick={refreshList}>
             <Sync className={iconClass} />
           </IconButton>
@@ -79,6 +94,7 @@ export default function VideoCollection(props) {
               getModel={(q) => {
                 showDialog(q);
               }}
+              onHeart={onHeart}
               onSearch={onChange}
             />
           ))}
@@ -127,8 +143,10 @@ function useVideoCollection({
     const href = `/${collectionType}${prefix}/${value}`
     navigate && navigate(href);
   };
+
+  
   const loadVideos = React.useCallback(
-    async (p) => {
+    async (p, f) => {
       const items = await getVideos(p);
       const searchKey$ =   `video-${p}`;
       console.log({ items });
@@ -138,6 +156,39 @@ function useVideoCollection({
     },
     [page]
   );
+
+  
+  const loadFavorites = React.useCallback(
+    async (p, f) => {
+      const items = await getFavorites(p);
+      const searchKey$ =   `heart-${p}`;
+      console.log({ items });
+      setState('response', { ...items, searchKey: searchKey$ });
+      setState('page', p);
+      setState('searchKey', searchKey$);
+    },
+    [page]
+  );
+
+  const recentVideos = React.useCallback(
+    async (p) => {
+      const searchKey$ =  `recent-${p}`;
+        const allTracks = VideoPersistService.get()
+        const first = (p - 1) * 30;
+        const Keys = allTracks.slice(first, first + 30)
+        console.log ({p, Keys})
+        if (!Keys.length) return alert(['NO KEYS IN', allTracks.length])
+        const videos = await getVideoKeys(Keys);
+        const items = {
+          records: videos.records,
+          count: allTracks.length
+        }
+        setState('response', { ...items , searchKey: searchKey$});
+        setState('page', p);
+        console.log (videos)
+        setState('searchKey', searchKey$);
+    }
+  )
 
   const searchVideos = React.useCallback(
     async (str, p) => {
@@ -161,6 +212,12 @@ function useVideoCollection({
           console.log ('searching for ', s, searchParam, p)
           await searchVideos(s || searchParam, p);
           break;
+        case 'heart':
+          await loadFavorites(p);
+          break;
+        case 'recent':
+          await recentVideos(p);
+          break;
         default:
           await loadVideos(p);
       }
@@ -171,13 +228,18 @@ function useVideoCollection({
     [collectionType]
   );
 
+  const onHeart = async (ID) => { 
+    const res = await toggleVideoFavorite(ID);
+    refreshList()
+  }
+
   const refreshList = React.useCallback(() => {
     load(page, collectionType, param);
   }, [page, collectionType, param])
 
   React.useEffect(() => {
     if (busy) return;
-    if (loaded) return;
+    if (loaded) return; 
     const renew = searchKey !== createKey();
     console.log({pageNum, page, param, searchParam, searchKey}, 
             [createKey(), response.searchKey, renew.toString()]);
@@ -200,6 +262,8 @@ function useVideoCollection({
     onChange,
     refreshList,
     systemDialogState, 
-    Prompt
+    collectionType,
+    Prompt,
+    onHeart
   };
 }

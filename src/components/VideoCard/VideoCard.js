@@ -12,7 +12,7 @@ import { Favorite, DeleteForever, Launch, MoreVert } from '@mui/icons-material';
 
 const ERR_IMAGE = 'https://s3.amazonaws.com/sploosh.me.uk/assets/XXX.jpg';
 
-export default function VideoCard({ video, onClick, onSearch, getModel, small }) {
+export default function VideoCard({ video, onClick, onSearch, getModel, small, onHeart }) {
   const [open, setOpen] = React.useState(false);
   const [src, setSrc] = React.useState(ERR_IMAGE);
   const [showModels, setShowModels] = React.useState(false);
@@ -39,13 +39,15 @@ export default function VideoCard({ video, onClick, onSearch, getModel, small })
   return (
     <Card sx={{ maxWidth: 345, opacity }} elevation={video.favorite ? 6 : 1}>
       <CardActionArea>
-        <CardMedia
-          component="img"
-          height={height}
-          image={src}
-          alt={video.title}
-          onClick={() => setOpen(!open)}
-        />
+        <Tooltip title={video.title}> 
+            <CardMedia
+              component="img"
+              height={height}
+              image={src}
+              alt={video.title}
+              onClick={() => setOpen(!open)}
+            />
+        </Tooltip>
         <RegionMenu
           {...menuProps}
           click={(i) => {
@@ -57,7 +59,7 @@ export default function VideoCard({ video, onClick, onSearch, getModel, small })
       <Collapse in={showMenu}>
         
         <Flex style={{padding:12}}>
-          <IconButton>
+          <IconButton onClick={() => onHeart(video.ID)}>
             <Favorite style={{ color: video.favorite ? 'red' : 'gray' }} /> 
           </IconButton>
           <IconButton>
@@ -82,7 +84,7 @@ export default function VideoCard({ video, onClick, onSearch, getModel, small })
                 ml={!!video.models.length ? 2 : 0}
                 variant="body2"
                 color="text.secondary"
-                onClick={() => onClick(video)}
+                onClick={() => onClick && onClick(video)}
                 classes={{root: video.favorite ? "favorite" : ""}}
               >
                 <Shorten limit={!!video.models.length ? 35 : 50}>
