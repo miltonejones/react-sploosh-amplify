@@ -21,7 +21,9 @@ export default function VideoCollection(props) {
     showDialog, 
     busy, 
     searchParam, 
-    searchKey } =
+    searchKey,
+    onChange 
+  } =
     useVideoCollection(props);
   const { count, records } = response;
   if (!records) return 'Loading...';
@@ -48,6 +50,7 @@ export default function VideoCollection(props) {
               getModel={(q) => {
                 showDialog(q);
               }}
+              onSearch={onChange}
             />
           ))}
         </div>
@@ -71,7 +74,8 @@ function useVideoCollection({
   searchParam,
   pageNum,
   onChange,
-  setBusy
+  setBusy,
+  navigate
 }) {
   const { state, setState } = useComponentState({
     page: 1,
@@ -81,19 +85,21 @@ function useVideoCollection({
     searchKey: `${collectionType}-${searchParam}-${pageNum}`
   });
   const { modelModalState, showDialog } = useModelModal();
-  const { page, response, busy, type, param, searchKey } = state;
+  const { page, response, busy, type, param, searchKey, loaded } = state;
   
-  const createKey = () => [collectionType,searchParam,pageNum].filter(f => !!f).join('-');
+  const createKey = React.useCallback(
+    () => [collectionType,searchParam,pageNum].filter(f => !!f).join('-'),
+      [collectionType,searchParam,pageNum]);
 
   const handleChange = (event, value) => {
     const prefix = !searchParam ? '' : `/${searchParam}`
     const href = `/${collectionType}${prefix}/${value}`
-    onChange && onChange(href);
+    navigate && navigate(href);
   };
   const loadVideos = React.useCallback(
     async (p) => {
       const items = await getVideos(p);
-      const searchKey$ = `video-${p}`;
+      const searchKey$ =   `video-${p}`;
       console.log({ items });
       setState('response', { ...items, searchKey: searchKey$ });
       setState('page', p);
@@ -105,7 +111,7 @@ function useVideoCollection({
   const searchVideos = React.useCallback(
     async (str, p) => {
       const items = await findVideos(str, p);
-      const searchKey$ = `search-${str}-${p}`;
+      const searchKey$ =  `search-${str}-${p}`;
       console.log({ items });
       setState('response', { ...items , searchKey: searchKey$});
       setState('page', p);
@@ -116,12 +122,13 @@ function useVideoCollection({
   );
 
   const load = React.useCallback(
-    async (p, t) => {
+    async (p, t, s) => {
       setState('busy', !0);
       setBusy(!0);
       switch (collectionType) {
         case 'search':
-          await searchVideos(searchParam, p);
+          console.log ('searching for ', s, searchParam, p)
+          await searchVideos(s || searchParam, p);
           break;
         default:
           await loadVideos(p);
@@ -134,10 +141,13 @@ function useVideoCollection({
   );
 
   React.useEffect(() => {
+    if (busy) return;
+    if (loaded) return;
     const renew = searchKey !== createKey();
-    console.log({pageNum, page,  searchKey}, [createKey(), response.searchKey, renew.toString()]);
-    (!!renew || !response.records) && load(pageNum, collectionType);
-  }, [response, pageNum, page, collectionType, type, param, searchParam]);
+    console.log({pageNum, page, param, searchParam, searchKey}, 
+            [createKey(), response.searchKey, renew.toString()]);
+    (!!renew || !response.records) && load(pageNum, collectionType, searchParam);
+  }, [response, busy, pageNum, page, collectionType, type, param, searchParam]);
 
   // const { count, records } = response;
   // if (!records) return 'Loading...';
@@ -151,6 +161,7 @@ function useVideoCollection({
     showDialog,
     busy,
     setBusy,
-    searchKey
+    searchKey,
+    onChange
   };
 }

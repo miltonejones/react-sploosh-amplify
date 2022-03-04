@@ -3,18 +3,20 @@ import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import CardMedia from '@mui/material/CardMedia';
 import Typography from '@mui/material/Typography';
-import { Avatar, Box } from '@mui/material';
+import { Avatar, Box, IconButton } from '@mui/material';
 import { CardActionArea, Collapse } from '@mui/material';
 import Tooltip from '@mui/material/Tooltip';
 import { RegionMenu } from '../';
 import { WindowManagerService } from '../../services/WindowManager';
+import { Favorite, DeleteForever, Launch, MoreVert } from '@mui/icons-material';
 
 const ERR_IMAGE = 'https://s3.amazonaws.com/sploosh.me.uk/assets/XXX.jpg';
 
-export default function VideoCard({ video, onClick, getModel, small }) {
+export default function VideoCard({ video, onClick, onSearch, getModel, small }) {
   const [open, setOpen] = React.useState(false);
   const [src, setSrc] = React.useState(ERR_IMAGE);
   const [showModels, setShowModels] = React.useState(false);
+  const [showMenu, setShowMenu] = React.useState(false);
   const height = small ? 100 : 160;
   const loadVideo = React.useCallback(() => {
     if (!video.image) {
@@ -32,8 +34,10 @@ export default function VideoCard({ video, onClick, getModel, small }) {
   const menuProps = small
     ? { width: 140, height: 100 }
     : { width: 220, height: 130 };
+  const visited = WindowManagerService.visited(video);
+  const opacity = visited ? 0.5 : 1;
   return (
-    <Card sx={{ maxWidth: 345 }}>
+    <Card sx={{ maxWidth: 345, opacity }} elevation={video.favorite ? 6 : 1}>
       <CardActionArea>
         <CardMedia
           component="img"
@@ -50,7 +54,21 @@ export default function VideoCard({ video, onClick, getModel, small }) {
           }}
           open={open}
         />
+      <Collapse in={showMenu}>
+        
+        <Flex style={{padding:12}}>
+          <IconButton>
+            <Favorite style={{ color: video.favorite ? 'red' : 'gray' }} /> 
+          </IconButton>
+          <IconButton>
+            <DeleteForever /> 
+          </IconButton>
+          <IconButton href={video.URL} target="_blank">
+            <Launch  /> 
+          </IconButton>
+        </Flex>
 
+        </Collapse>
         {!small && (
           <CardContent>
             <Flex sx={{ width: '100%' }}>
@@ -65,8 +83,9 @@ export default function VideoCard({ video, onClick, getModel, small }) {
                 variant="body2"
                 color="text.secondary"
                 onClick={() => onClick(video)}
+                classes={{root: video.favorite ? "favorite" : ""}}
               >
-                <Shorten limit={!!video.models.length ? 30 : 40}>
+                <Shorten limit={!!video.models.length ? 35 : 55}>
                   {video.title}
                 </Shorten>
               </Typography>
@@ -79,9 +98,9 @@ export default function VideoCard({ video, onClick, getModel, small }) {
                     {video.models[0].Name}
                   </u>{' '}
                   {video.models.length > 1 && (
-                    <u onClick={() => setShowModels(!showModels)}>
-                      and {video.models.length - 1} more...
-                    </u>
+                    <b><u onClick={() => setShowModels(!showModels)}>
+                    + {video.models.length - 1} more...
+                  </u></b>
                   )}
                 </Typography>
                 {video.models.length > 1 && (
@@ -103,7 +122,10 @@ export default function VideoCard({ video, onClick, getModel, small }) {
                 {video.domain}
               </Typography>
               <Spacer />
-              {video.studio}
+              <u onClick={() => onSearch(`${video.studio}-`)}>{video.studio}</u>
+              <IconButton onClick={() => setShowMenu(!showMenu)}>
+                <MoreVert />
+              </IconButton>
             </Flex>
           </CardContent>
         )}
