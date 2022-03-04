@@ -1,14 +1,16 @@
 import React from 'react';
 import useComponentState from '../../hooks/useComponentState';
-import { getVideos, getVideo, findVideos } from '../../connector/DbConnector';
+import { getVideos, getVideo, findVideos, addVideo } from '../../connector/DbConnector';
 import {
   VideoCard,
   ModelModal,
   useModelModal,
   Flex,
   StyledPagination,
+  Spacer
 } from '../';
-import { TextField, Box, Button } from '@mui/material';
+import { TextField, Box, Button, IconButton } from '@mui/material';
+import { Sync, Add } from '@mui/icons-material';
 import './VideoCollection.css';
 
 export default function VideoCollection(props) {
@@ -17,28 +19,48 @@ export default function VideoCollection(props) {
     response, 
     pageNum, 
     handleChange, 
-    modelModalState, 
+    modelModalState,  
     showDialog, 
     busy, 
     searchParam, 
     searchKey,
-    onChange 
+    onChange ,
+    refreshList
   } =
     useVideoCollection(props);
   const { count, records } = response;
+
+  const iconClass = busy ? 'spin' : '';
   if (!records) return 'Loading...';
   const totalPages = Math.ceil(count / 30);
+
+  const add = async () => {
+    const URL = prompt ('Enter video URL');
+    if (!URL) return;
+    const id = await addVideo(URL);
+    // alert (id + ' was added');
+    refreshList();
+  }
+
   return (
     <Box  className="VideoCollection">
       <Box className="head">
-        <Flex>
-          {/* [{pageNum}][[{searchParam}]][{searchKey}][{response.searchKey}] */}
+        <Flex sx={{width: '100%'}}> 
+          <Box>
+            {count} videos
+          </Box>
           <StyledPagination
             totalPages={totalPages}
             page={pageNum}
             handleChange={handleChange}
           />
-          {!!busy && <em>loading...</em>}
+          <Spacer />
+          <IconButton onClick={refreshList}>
+            <Sync className={iconClass} />
+          </IconButton>
+          <IconButton onClick={add}>
+            <Add />
+          </IconButton>
         </Flex>
       </Box>
       <Box className="App">
@@ -140,6 +162,10 @@ function useVideoCollection({
     [collectionType]
   );
 
+  const refreshList = React.useCallback(() => {
+    load(page, collectionType, param);
+  }, [page, collectionType, param])
+
   React.useEffect(() => {
     if (busy) return;
     if (loaded) return;
@@ -162,6 +188,7 @@ function useVideoCollection({
     busy,
     setBusy,
     searchKey,
-    onChange
+    onChange,
+    refreshList
   };
 }

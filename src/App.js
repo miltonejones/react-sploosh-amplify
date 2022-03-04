@@ -26,8 +26,7 @@ function VideoGrid (props) {
   const tabValue = searches?.map(f => f.param).indexOf(queryParam) + 1;
   const handleChange = (event, newValue) => {
     if (newValue === 0) navigate(`/video/1`)  
-    if (newValue === searches.length + 1) {
-      // alert ([newValue, tabValue])
+    if (newValue === searches.length + 1) { 
       const doomed = searches[tabValue - 1].param;
       return removeTab(doomed)
     }
@@ -42,7 +41,9 @@ function VideoGrid (props) {
           <IconButton onClick={() => setState('searchDrawerOpen', !searchDrawerOpen)}>
             <Menu />
           </IconButton>
-          <Avatar onClick={() => navigate('/')} sx={{ml: 4, mr: 2}} src="https://s3.amazonaws.com/sploosh.me.uk/assets/sploosh.png" alt="logo" />
+          <Avatar onClick={() => navigate('/')} sx={{ml: 4, mr: 2}} 
+              src="https://s3.amazonaws.com/sploosh.me.uk/assets/sploosh.png" 
+              alt="logo" />
           <Spacer />
           <TextField  
            InputProps={{
@@ -102,10 +103,6 @@ function useApp () {
     searches: []
   });
   const { page, param, collectionType, searches, busy } = state;
-
-  // React.useEffect(() => {
-  //   !!queryParam && queryParam !== param && setState('param', queryParam)
-  // }, [queryParam, param])
 
   const prefix = !queryParam ? '' : `/${queryParam}`
   const removeTab = (p) => {

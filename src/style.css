@@ -51,7 +51,7 @@ body {
   height: 48px;
   align-items: center;
   width: calc(100vw - 80px);
-  background-color: var(--color-primary);
+  /* background-color: var(--color-primary); */
   padding: 12px 48px 6px 32px;
   box-shadow: var(--card-shadow);
 }
@@ -63,6 +63,10 @@ body {
 
 .maxWidth {
   max-width: 25vw;
+}
+
+.red {
+  color: tomato;
 }
 
 @keyframes spin {

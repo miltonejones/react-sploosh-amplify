@@ -85,15 +85,17 @@ export default function VideoCard({ video, onClick, onSearch, getModel, small })
                 onClick={() => onClick(video)}
                 classes={{root: video.favorite ? "favorite" : ""}}
               >
-                <Shorten limit={!!video.models.length ? 35 : 55}>
+                <Shorten limit={!!video.models.length ? 35 : 50}>
                   {video.title}
                 </Shorten>
               </Typography>
             </Flex>
-            {!!video.models.length && (
-              <>
-                <Typography variant="caption" color="text.secondary">
-                  <b>Models:</b>{' '}
+              
+            <Typography variant="caption" color="text.secondary">
+              <b>Models:</b>{' '}
+
+              {!!video.models.length && (
+                <>
                   <u onClick={() => getModel(video.models[0].ID)}>
                     <ModelName {...video.models[0]} /> 
                   </u>{' '}
@@ -102,21 +104,32 @@ export default function VideoCard({ video, onClick, onSearch, getModel, small })
                     + {video.models.length - 1} more...
                   </u></b>
                   )}
-                </Typography>
-                {video.models.length > 1 && (
-                  <Collapse in={showModels}>
-                    {video.models.map((f, i) => (
-                      <span key={f.ID} >
-                        <u onClick={() => getModel(f.ID)}>
-                          <ModelName {...f} />
-                        </u>
-                        {i < video.models.length - 1 && <i>, </i>}
-                      </span>
-                    ))}
-                  </Collapse>
-                )}
-              </>
+                </> 
+              )}
+              {!video.models.length && (
+                <b className="red">
+                  <u >
+                    Add model...
+                  </u> 
+                </b> 
+              )}
+            </Typography>
+             
+           
+            
+            {video.models.length > 1 && (
+              <Collapse in={showModels}>
+                {video.models.map((f, i) => i > 0 && (
+                  <span key={f.ID} >
+                    <u onClick={() => getModel(f.ID)}>
+                      <ModelName {...f} />
+                    </u>
+                    {i < video.models.length - 1 && <i>, </i>}
+                  </span>
+                ))}
+              </Collapse>
             )}
+
             <Flex>
               <Typography variant="body2" color="text.secondary">
                 {video.domain}

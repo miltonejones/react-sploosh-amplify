@@ -21,3 +21,13 @@ export const findVideos = async (param, page) => {
   const response = await fetch(API_ENDPOINT + `/find/${param}/${page}`);
   return await response.json();
 };
+
+export const addVideo = async (URL) => {
+  const requestOptions = {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ URL}),
+  };
+  const response = await fetch(API_ENDPOINT + '/add-video', requestOptions);
+  return await response.json();
+};
