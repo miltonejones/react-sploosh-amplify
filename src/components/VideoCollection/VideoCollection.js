@@ -1,6 +1,7 @@
 import React from 'react';
 import useComponentState from '../../hooks/useComponentState';
 import { VideoPersistService } from '../../services/VideoPersist'
+import   { SplooshContext }  from '../../hooks/useSploosh';
 import { WindowManagerService } from '../../services/WindowManager';
 import { 
   getVideos, 
@@ -14,8 +15,7 @@ import {
 } from '../../connector/DbConnector';
 import {
   VideoCard,
-  ModelModal,
-  useModelModal,
+  ModelModal, 
   Flex,
   StyledPagination,
   Spacer, 
@@ -44,8 +44,7 @@ export default function VideoCollection(props) {
     Prompt,
     onHeart,
     onDrop
-  } =
-    useVideoCollection(props);
+  } = useVideoCollection(props);
   const { count, records } = response;
 
   const iconClass = busy ? 'spin' : '';
@@ -112,7 +111,6 @@ export default function VideoCollection(props) {
           />
         </Flex>
       </Box>
-      <ModelModal {...modelModalState} />
       <SystemDialog {...systemDialogState}/>
     </Box>
   );
@@ -133,7 +131,12 @@ function useVideoCollection({
     response: {},
     searchKey: `${collectionType}-${searchParam}-${pageNum}`
   });
-  const { modelModalState, showDialog } = useModelModal();
+
+
+  const {
+    modelModalState, showDialog
+} = React.useContext(SplooshContext);
+ 
   const { systemDialogState, Prompt, Confirm } = useSystemDialog()
   const { page, response, busy, type, param, searchKey, loaded } = state;
   
@@ -238,7 +241,7 @@ function useVideoCollection({
 
   const onDrop  = async (ID, title="this video") => { 
     const yes = await Confirm('Are you sure you want to delete ' + title + '?')
-    if (!yes) return alert ('Well OK then!')
+    if (!yes) return; // alert ('Well OK then!')
     const res = await deleteVideo(ID);
     refreshList()
   }
