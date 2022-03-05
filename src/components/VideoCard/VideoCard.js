@@ -101,18 +101,18 @@ export default function VideoCard({ video, onClick, onSearch, getModel, small, o
 
             {!!video.models.length && (
               <>
-                <u onClick={() => getModel(video.models[0].ID)}>
+                <u className="action" onClick={() => getModel(video.models[0].ID)}>
                   <ModelName {...video.models[0]} /> 
                 </u>{' '}
                 {video.models.length > 1 && (
-                  <b><u onClick={() => setShowModels(!showModels)}>
+                  <b><u className="action" onClick={() => setShowModels(!showModels)}>
                   + {video.models.length - 1} more...
                 </u></b>
                 )}
               </> 
             )}
             {!video.models.length && (
-              <b className="red">
+              <b className="red action">
                 <u >
                   Add model...
                 </u> 
@@ -126,7 +126,7 @@ export default function VideoCard({ video, onClick, onSearch, getModel, small, o
             <Collapse in={showModels}>
               {video.models.map((f, i) => i > 0 && (
                 <span key={f.ID} >
-                  <u onClick={() => getModel(f.ID)}>
+                  <u className="action" onClick={() => getModel(f.ID)}>
                     <ModelName {...f} />
                   </u>
                   {i < video.models.length - 1 && <i>, </i>}
@@ -140,7 +140,7 @@ export default function VideoCard({ video, onClick, onSearch, getModel, small, o
               {video.domain}
             </Typography>
             <Spacer />
-            <u onClick={() => onSearch(`${video.studio}-`)}>{video.studio}</u>
+            <u className="action" onClick={() => onSearch(`${video.studio}-`)}>{video.studio}</u>
             <IconButton onClick={() => setShowMenu(!showMenu)}>
               <MoreVert />
             </IconButton>
@@ -177,7 +177,7 @@ export const Shorten = ({ children, limit = 40 }) => {
   if (text.length <= limit) return text;
   return (
     <Tooltip title={text}>
-      <span>{text.substr(0, limit) + '...'}</span>
+      <span className="action">{text.substr(0, limit) + '...'}</span>
     </Tooltip>
   );
 };
