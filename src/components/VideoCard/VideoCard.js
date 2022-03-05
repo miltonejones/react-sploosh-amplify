@@ -37,7 +37,7 @@ export default function VideoCard({ video, onClick, onSearch, getModel, small, o
   const visited = WindowManagerService.visited(video);
   const opacity = visited ? 0.5 : 1;
   return (
-    <Card sx={{ maxWidth: 345, opacity }} elevation={video.favorite ? 6 : 1}>
+    <Card sx={{ maxWidth: 345, opacity, position: 'relative' }} elevation={video.favorite ? 6 : 1}>
       <CardActionArea>
         <Tooltip title={video.title}> 
             <CardMedia
@@ -48,104 +48,108 @@ export default function VideoCard({ video, onClick, onSearch, getModel, small, o
               onClick={() => setOpen(!open)}
             />
         </Tooltip>
-        <RegionMenu
-          {...menuProps}
-          click={(i) => {
-            WindowManagerService.launch(video, i);
-            setOpen(false);
-          }}
-          open={open}
-        />
-      <Collapse in={showMenu}>
-        
-        <Flex style={{padding:12}}>
-          <IconButton onClick={() => onHeart(video.ID)}>
-            <Favorite style={{ color: video.favorite ? 'red' : 'gray' }} /> 
-          </IconButton>
-          <IconButton onClick={() => onDrop(video.ID, video.title)}>
-            <DeleteForever /> 
-          </IconButton>
-          <IconButton href={video.URL} target="_blank">
-            <Launch  /> 
-          </IconButton>
-        </Flex>
-
-        </Collapse>
-        {!small && (
-          <CardContent>
-            <Flex sx={{ width: '100%' }}>
-              {!!video.models.length && (
-                <Avatar
-                  src={video.models[0].image}
-                  alt={video.models[0].Name}
-                />
-              )}
-              <Typography
-                ml={!!video.models.length ? 2 : 0}
-                variant="body2"
-                color="text.secondary"
-                onClick={() => onClick && onClick(video)}
-                classes={{root: video.favorite ? "favorite" : ""}}
-              >
-                <Shorten limit={!!video.models.length ? 35 : 50}>
-                  {video.title}
-                </Shorten>
-              </Typography>
-            </Flex>
-              
-            <Typography variant="caption" color="text.secondary">
-              <b>Models:</b>{' '}
-
-              {!!video.models.length && (
-                <>
-                  <u onClick={() => getModel(video.models[0].ID)}>
-                    <ModelName {...video.models[0]} /> 
-                  </u>{' '}
-                  {video.models.length > 1 && (
-                    <b><u onClick={() => setShowModels(!showModels)}>
-                    + {video.models.length - 1} more...
-                  </u></b>
-                  )}
-                </> 
-              )}
-              {!video.models.length && (
-                <b className="red">
-                  <u >
-                    Add model...
-                  </u> 
-                </b> 
-              )}
-            </Typography>
-             
-           
-            
-            {video.models.length > 1 && (
-              <Collapse in={showModels}>
-                {video.models.map((f, i) => i > 0 && (
-                  <span key={f.ID} >
-                    <u onClick={() => getModel(f.ID)}>
-                      <ModelName {...f} />
-                    </u>
-                    {i < video.models.length - 1 && <i>, </i>}
-                  </span>
-                ))}
-              </Collapse>
-            )}
-
-            <Flex>
-              <Typography variant="body2" color="text.secondary">
-                {video.domain}
-              </Typography>
-              <Spacer />
-              <u onClick={() => onSearch(`${video.studio}-`)}>{video.studio}</u>
-              <IconButton onClick={() => setShowMenu(!showMenu)}>
-                <MoreVert />
-              </IconButton>
-            </Flex>
-          </CardContent>
-        )}
       </CardActionArea>
+
+      <RegionMenu
+        {...menuProps}
+        click={(i) => {
+          WindowManagerService.launch(video, i);
+          setOpen(false);
+        }}
+        open={open}
+      />
+
+    <Collapse in={showMenu}>
+      
+      <Flex style={{padding:12}}>
+        <IconButton onClick={() => onHeart(video.ID)}>
+          <Favorite style={{ color: video.favorite ? 'red' : 'gray' }} /> 
+        </IconButton>
+        <IconButton onClick={() => onDrop(video.ID, video.title)}>
+          <DeleteForever /> 
+        </IconButton>
+        <IconButton href={video.URL} target="_blank">
+          <Launch  /> 
+        </IconButton>
+      </Flex>
+
+      </Collapse>
+      {!small && (
+        <CardContent>
+          <Flex sx={{ width: '100%' }}>
+            {!!video.models.length && (
+              <Avatar
+                src={video.models[0].image}
+                alt={video.models[0].Name}
+              />
+            )}
+            <Typography
+              ml={!!video.models.length ? 2 : 0}
+              variant="body2"
+              color="text.secondary"
+              onClick={() => onClick && onClick(video)}
+              classes={{root: video.favorite ? "favorite" : ""}}
+            >
+              <Shorten limit={!!video.models.length ? 35 : 50}>
+                {video.title}
+              </Shorten>
+            </Typography>
+          </Flex>
+            
+          <Typography variant="caption" color="text.secondary">
+            <b>Models:</b>{' '}
+
+            {!!video.models.length && (
+              <>
+                <u onClick={() => getModel(video.models[0].ID)}>
+                  <ModelName {...video.models[0]} /> 
+                </u>{' '}
+                {video.models.length > 1 && (
+                  <b><u onClick={() => setShowModels(!showModels)}>
+                  + {video.models.length - 1} more...
+                </u></b>
+                )}
+              </> 
+            )}
+            {!video.models.length && (
+              <b className="red">
+                <u >
+                  Add model...
+                </u> 
+              </b> 
+            )}
+          </Typography>
+            
+          
+          
+          {video.models.length > 1 && (
+            <Collapse in={showModels}>
+              {video.models.map((f, i) => i > 0 && (
+                <span key={f.ID} >
+                  <u onClick={() => getModel(f.ID)}>
+                    <ModelName {...f} />
+                  </u>
+                  {i < video.models.length - 1 && <i>, </i>}
+                </span>
+              ))}
+            </Collapse>
+          )}
+
+          <Flex>
+            <Typography variant="body2" color="text.secondary">
+              {video.domain}
+            </Typography>
+            <Spacer />
+            <u onClick={() => onSearch(`${video.studio}-`)}>{video.studio}</u>
+            <IconButton onClick={() => setShowMenu(!showMenu)}>
+              <MoreVert />
+            </IconButton>
+          </Flex>
+        </CardContent>
+      )}
+      
     </Card>
+
   );
 }
 

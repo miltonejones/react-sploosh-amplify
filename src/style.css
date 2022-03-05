@@ -27,6 +27,17 @@ body {
   gap: 1rem;
 }
 
+.ModelGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  /* max-width: 1360px; */
+  width: calc(100vw - 60px);
+  margin: 0 30px;
+  /* border: solid 4px green; */
+  padding-bottom: 20px;
+  gap: 1rem;
+}
+
 .app-region-menu {
   position: absolute;
   top: -200px;
