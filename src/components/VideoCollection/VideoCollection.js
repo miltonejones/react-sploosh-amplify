@@ -23,7 +23,7 @@ import {
   useSystemDialog 
 } from '../';
 import { TextField, Box, Button, IconButton } from '@mui/material';
-import { Sync, Add, VideoLabel } from '@mui/icons-material';
+import { Sync, Add, VideoLabel, Close } from '@mui/icons-material';
 import './VideoCollection.css';
 
 export default function VideoCollection(props) {
@@ -48,7 +48,7 @@ export default function VideoCollection(props) {
   const { count, records } = response;
 
   const iconClass = busy ? 'spin' : '';
-  if (!records) return 'Loading...';
+  if (!records) return 'Loading...' + collectionType;
   const totalPages = Math.ceil(count / 30);
 
   const add = async () => {
@@ -65,7 +65,7 @@ export default function VideoCollection(props) {
       <Box className="head">
         <Flex sx={{width: '100%'}}> 
           <Box>
-            {count} videos
+            {count} videos 
           </Box>
           <StyledPagination
             totalPages={totalPages}
@@ -75,9 +75,14 @@ export default function VideoCollection(props) {
           <Spacer />
           
     {!!WindowManagerService.launched.length &&  
-        ( <IconButton onClick={() => WindowManagerService.focus()}>
+        ( <>
+          <IconButton onClick={() => WindowManagerService.exit()}>
+            <Close />
+          </IconButton>
+          <IconButton onClick={() => WindowManagerService.focus()}>
             <VideoLabel />
-          </IconButton>)}
+          </IconButton>
+        </>)}
           <IconButton onClick={refreshList}>
             <Sync className={iconClass} />
           </IconButton>
@@ -182,7 +187,6 @@ function useVideoCollection({
         const allTracks = VideoPersistService.get()
         const first = (p - 1) * 30;
         const Keys = allTracks.slice(first, first + 30)
-        console.log ({p, Keys})
         if (!Keys.length) return alert(['NO KEYS IN', allTracks.length])
         const videos = await getVideoKeys(Keys);
         const items = {
@@ -255,7 +259,7 @@ function useVideoCollection({
     if (loaded) return; 
     const renew = searchKey !== createKey();
     console.log({pageNum, page, param, searchParam, searchKey}, 
-            [createKey(), response.searchKey, renew.toString()]);
+            [createKey(), response.searchKey, renew.toString(), response]);
     (!!renew || !response.records) && load(pageNum, collectionType, searchParam);
   }, [response, busy, pageNum, page, collectionType, type, param, searchParam]);
 

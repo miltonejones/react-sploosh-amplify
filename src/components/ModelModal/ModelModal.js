@@ -51,7 +51,7 @@ export default function ModelModal(props) {
     >
       <DialogTitle>
         <Flex mr={2}>
-          {!!model.image && <Avatar onClick={()=>alert( model.ID )} src={model.image} alt={model.name} />}
+          {!!model.image && <Avatar variant="rounded" onClick={()=>alert( model.ID )} src={model.image} alt={model.name} />}
           <Stack ml={2}>
             <Typography variant="body1">{model.name}</Typography>
             <Typography variant="caption">{videos.count} videos </Typography>
