@@ -53,7 +53,7 @@ class VideoPersistService$ {
 
   get() {
     try {
-      return JSON.parse(this.getSetting(RECENT_WATCHED_SETTING_NAME) || []);
+      return JSON.parse(this.getSetting(RECENT_WATCHED_SETTING_NAME) || []).reverse();
     } catch (e) { return []; }
   }
 

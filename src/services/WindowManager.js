@@ -15,7 +15,7 @@ class WindowManagerService$ {
       const str = `embed/${regex[1]}/${regex[2]}/${re.width}/${re.height}`;
       out = out.replace(regex[0], str);
     }
-    out = out.replace('https://player.javdisk.com/embed.html', 'https://javdoe.to/player')
+  //  out = out.replace('https://player.javdisk.com/embed.html', 'https://javdoe.to/player')
     return out;
   }
   region(video, index = 0) {

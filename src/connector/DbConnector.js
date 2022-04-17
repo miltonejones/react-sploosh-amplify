@@ -67,6 +67,6 @@ export const getVideoKeys = async (Keys) => {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ Keys}),
   };
-  const response = await fetch(API_ENDPOINT + '/video-keys', requestOptions);
+  const response = await fetch(API_ENDPOINT + '/video-ids', requestOptions);
   return await response.json();
 };
