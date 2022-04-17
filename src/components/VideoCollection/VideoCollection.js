@@ -23,7 +23,7 @@ import {
   useSystemDialog 
 } from '../';
 import { TextField, Box, Button, IconButton } from '@mui/material';
-import { Sync, Add, VideoLabel } from '@mui/icons-material';
+import { Sync, Add, VideoLabel, Close } from '@mui/icons-material';
 import './VideoCollection.css';
 
 export default function VideoCollection(props) {
@@ -75,9 +75,14 @@ export default function VideoCollection(props) {
           <Spacer />
           
     {!!WindowManagerService.launched.length &&  
-        ( <IconButton onClick={() => WindowManagerService.focus()}>
+        ( <>
+          <IconButton onClick={() => WindowManagerService.exit()}>
+            <Close />
+          </IconButton>
+          <IconButton onClick={() => WindowManagerService.focus()}>
             <VideoLabel />
-          </IconButton>)}
+          </IconButton>
+        </>)}
           <IconButton onClick={refreshList}>
             <Sync className={iconClass} />
           </IconButton>
