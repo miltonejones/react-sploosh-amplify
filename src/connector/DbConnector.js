@@ -70,3 +70,21 @@ export const getVideoKeys = async (Keys) => {
   const response = await fetch(API_ENDPOINT + '/video-ids', requestOptions);
   return await response.json();
 };
+
+export const getModelsByName = async (name) => {
+  const response = await fetch(API_ENDPOINT + `/model-name/${name}`);
+  return await response.json();
+}
+
+
+export const addModelToVideo = async (trackFk, modelFk) => {
+  const requestOptions = {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ trackFk, modelFk }),
+  };
+  const response = await fetch(API_ENDPOINT + '/model/cast', requestOptions);
+  return await response.json();
+};
+
+

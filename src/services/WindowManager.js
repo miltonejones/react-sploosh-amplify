@@ -1,3 +1,5 @@
+import React from 'react';
+import Observer from "./Observer";
 import { WINDOW_REGIONS } from '../constants';
 import { VideoPersistService } from './VideoPersist'
 
@@ -82,4 +84,37 @@ class WindowManagerService$ {
   }
 }
 const WindowManagerService = new WindowManagerService$();
-export { WindowManagerService };
+
+const windowChange = new Observer();
+
+function useWindowManager () { 
+
+
+  const launch = (video, i) => {
+    WindowManagerService.launch(video, i);  
+    windowChange.next(true);
+  }
+  
+  const exit = () => {
+    WindowManagerService.exit();
+    windowChange.next(false); 
+  }
+  
+  const focus = () => {
+    WindowManagerService.focus(); 
+  }
+
+  const getLength = () => WindowManagerService.launched.length;
+  
+  const visited = (video) => WindowManagerService.visited(video);
+
+  return { 
+    getLength, 
+    launch,
+    exit,
+    focus,
+    visited
+  }
+}
+
+export { WindowManagerService, useWindowManager, windowChange };

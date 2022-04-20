@@ -7,8 +7,9 @@ import { Avatar, Box, IconButton } from '@mui/material';
 import { CardActionArea, Collapse } from '@mui/material';
 import Tooltip from '@mui/material/Tooltip';
 import { RegionMenu } from '../';
-import { WindowManagerService } from '../../services/WindowManager';
+// import { WindowManagerService } from '../../services/WindowManager';
 import { Favorite, DeleteForever, Launch, MoreVert } from '@mui/icons-material';
+import { useWindowManager } from '../../services/WindowManager';
 
 const ERR_IMAGE = 'https://s3.amazonaws.com/sploosh.me.uk/assets/XXX.jpg';
 
@@ -17,6 +18,7 @@ export default function VideoCard({ video, onClick, onSearch, getModel, small, o
   const [src, setSrc] = React.useState(ERR_IMAGE);
   const [showModels, setShowModels] = React.useState(false);
   const [showMenu, setShowMenu] = React.useState(false);
+  const WindowManager = useWindowManager()
   const height = small ? 100 : 160;
   const loadVideo = React.useCallback(() => {
     if (!video.image) {
@@ -34,7 +36,7 @@ export default function VideoCard({ video, onClick, onSearch, getModel, small, o
   const menuProps = small
     ? { width: 140, height: 100 }
     : { width: 220, height: 130 };
-  const visited = WindowManagerService.visited(video);
+  const visited = WindowManager.visited(video);
   const opacity = visited ? 0.5 : 1;
   return (
     <Card sx={{ maxWidth: 345, opacity, position: 'relative' }} elevation={video.favorite ? 6 : 1}>
@@ -53,7 +55,7 @@ export default function VideoCard({ video, onClick, onSearch, getModel, small, o
       <RegionMenu
         {...menuProps}
         click={(i) => {
-          WindowManagerService.launch(video, i);
+          WindowManager.launch(video, i);
           setOpen(false);
         }}
         open={open}

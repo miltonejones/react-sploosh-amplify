@@ -2,7 +2,7 @@ import React from 'react';
 import useComponentState from '../../hooks/useComponentState';
 import { VideoPersistService } from '../../services/VideoPersist'
 import   { SplooshContext }  from '../../hooks/useSploosh';
-import { WindowManagerService } from '../../services/WindowManager';
+import { useWindowManager, windowChange } from '../../services/WindowManager';
 import { 
   getVideos, 
   getVideo, 
@@ -17,6 +17,7 @@ import {
   VideoCard,
   ModelModal, 
   Flex,
+  FabGroup,
   StyledPagination,
   Spacer, 
   SystemDialog, 
@@ -25,6 +26,8 @@ import {
 import { TextField, Box, Button, IconButton } from '@mui/material';
 import { Sync, Add, VideoLabel, Close } from '@mui/icons-material';
 import './VideoCollection.css';
+
+
 
 export default function VideoCollection(props) {
   const { 
@@ -45,7 +48,17 @@ export default function VideoCollection(props) {
     onHeart,
     onDrop
   } = useVideoCollection(props);
+  const WindowManager = useWindowManager()
   const { count, records } = response;
+  const [windowLength, setWindowLength] = React.useState(0)
+  React.useEffect(() => {
+    const sub = windowChange.subscribe(on => {
+      console.log ({ sub }); 
+      setWindowLength(WindowManager.getLength())
+    })
+
+    return () => sub.unsubscribe();
+  })
 
   const iconClass = busy ? 'spin' : '';
   if (!records) return 'Loading...' + collectionType;
@@ -60,7 +73,27 @@ export default function VideoCollection(props) {
     // alert (id + ' was added');
     refreshList();
   } 
+  const windowButtons = [
+    {
+      icon: <Close />,
+      onClick: () => WindowManager.exit()
+    },
+    {
+      icon: <VideoLabel />,
+      onClick: () => WindowManager.focus()
+    }
+  ]
+  const editButtons = [
+    {
+      icon:  <Sync className={iconClass} />,
+      onClick: refreshList
+    }
+  ]
+
+  const fabButtons = (!!windowLength ? windowButtons : []).concat(editButtons);
+
   return (
+    <>
     <Box  className="VideoCollection">
       <Box className="head">
         <Flex sx={{width: '100%'}}> 
@@ -73,22 +106,7 @@ export default function VideoCollection(props) {
             handleChange={handleChange}
           />
           <Spacer />
-          
-    {!!WindowManagerService.launched.length &&  
-        ( <>
-          <IconButton onClick={() => WindowManagerService.exit()}>
-            <Close />
-          </IconButton>
-          <IconButton onClick={() => WindowManagerService.focus()}>
-            <VideoLabel />
-          </IconButton>
-        </>)}
-          <IconButton onClick={refreshList}>
-            <Sync className={iconClass} />
-          </IconButton>
-          <IconButton onClick={add}>
-            <Add />
-          </IconButton>
+ 
         </Flex>
       </Box>
       <Box className="App">
@@ -118,6 +136,12 @@ export default function VideoCollection(props) {
       </Box>
       <SystemDialog {...systemDialogState}/>
     </Box>
+      <FabGroup 
+        mainClick={add}
+        icon={<Add />}
+        buttons={fabButtons}
+      />
+    </>
   );
 }
 
