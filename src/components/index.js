@@ -5,11 +5,14 @@ import VideoCollection from './VideoCollection/VideoCollection';
 import SearchDrawer from './SearchDrawer/SearchDrawer';
 import ModelGrid from './ModelGrid/ModelGrid';
 import ModelCard from './ModelCard/ModelCard';
+import ModelSelect from './ModelSelect/ModelSelect';
+import FabGroup from './FabGroup/FabGroup';
 import Toolbar from './Toolbar/Toolbar';
 import { StyledPagination, SystemDialog, useSystemDialog } from './Control/Control';
 
 export {
   VideoCard,
+  FabGroup,
   RegionMenu,
   ModelModal,
   useModelModal,
@@ -22,6 +25,7 @@ export {
   SystemDialog, 
   ModelGrid,
   ModelCard,
+  ModelSelect,
   Toolbar,
   useSystemDialog
 };

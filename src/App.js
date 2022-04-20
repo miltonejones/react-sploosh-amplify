@@ -11,6 +11,7 @@ import {
   Route
 } from "react-router-dom";
 import useSploosh, { SplooshContext } from './hooks/useSploosh';
+import  { getModelsByName } from './connector/DbConnector';
 
 function VideoGrid (props) {
   const sploosh = useSploosh(props);
@@ -26,9 +27,11 @@ function VideoGrid (props) {
     searchDrawerOpen,
     modelModalState, 
     pageIndex,
+    loaded,
     removeTab 
   } = sploosh;
   const tabValue = searches?.map(f => f.param).indexOf(queryParam) + 1;
+ 
   const handleChange = (event, newValue) => {
     if (newValue === 0) navigate(`/video/1`)  
     if (newValue === searches.length + 1) { 
@@ -41,13 +44,22 @@ function VideoGrid (props) {
 
   const Component = pageIndex < 3 ? VideoCollection : ModelGrid;
 
+  React.useEffect(() => { 
+    if (loaded) return;
+    getModelsByName('bree').then((res) => {
+       console.log ({ res })
+    }).catch (console.log)
+    setState(s =>  ({...s, loaded: 1}))
+  }, [loaded])
+
+
   return (
     <SplooshContext.Provider value={{ ...sploosh }}>
       <Box className="App">
 
         {/* toolbar */}
         <Toolbar viewIndex={pageIndex} />
-        
+   
         {/* search tabs */}
         <Collapse className="head" in={!!searches.length}>
           <Tabs onChange={handleChange} value={tabValue}>
