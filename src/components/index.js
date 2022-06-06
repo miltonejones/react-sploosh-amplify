@@ -8,7 +8,7 @@ import ModelCard from './ModelCard/ModelCard';
 import ModelSelect from './ModelSelect/ModelSelect';
 import FabGroup from './FabGroup/FabGroup';
 import Toolbar from './Toolbar/Toolbar';
-import { StyledPagination, SystemDialog, useSystemDialog } from './Control/Control';
+import { StyledPagination, SystemDialog, useSystemDialog, Tabs } from './Control/Control';
 
 export {
   VideoCard,
@@ -27,5 +27,6 @@ export {
   ModelCard,
   ModelSelect,
   Toolbar,
+  Tabs,
   useSystemDialog
 };

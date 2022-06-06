@@ -2,8 +2,8 @@ import React from 'react';
 import './style.css';
 import useComponentState from './hooks/useComponentState';
 import InputAdornment from '@mui/material/InputAdornment';
-import { VideoCollection, ModelGrid, SearchDrawer, Toolbar, ModelModal } from './components';
-import { Box , Tab, Tabs, Collapse } from '@mui/material';
+import {Tabs,VideoCollection, ModelGrid, SearchDrawer, Toolbar, ModelModal } from './components'; 
+import { Box , Tab, Collapse } from '@mui/material';
 import { Close } from '@mui/icons-material';
 import { 
   BrowserRouter,  
@@ -62,7 +62,7 @@ function VideoGrid (props) {
    
         {/* search tabs */}
         <Collapse className="head" in={!!searches.length}>
-          <Tabs onChange={handleChange} value={tabValue}>
+          <Tabs onChange={handleChange} removeTab={removeTab} value={tabValue} items={["All Videos"].concat(searches?.map(s => s.param))}>
             <Tab label="All Videos"/>
             {searches?.map (s => <Tab label={s.param} key={s.param} />)} 
             <Tab icon={<Close />} />

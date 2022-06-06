@@ -7,11 +7,51 @@ import {
   DialogContent,
   DialogContentText,
   Stack, 
+  Tooltip,
   TextField,
-  DialogTitle
+  Box,
+  DialogTitle,
+  styled
 } from '@mui/material';
+import { Close } from '@mui/icons-material';
 
 
+const Flex = styled(Box)({
+  display: 'flex'
+})
+
+const Tab = styled(Box)(({selected}) => ({
+  display: 'flex',
+  alignItems: 'center',
+  cursor: 'pointer',
+  padding: '12px 16px 4px 16px',
+  borderBottom: selected ? 'solid 2px #37a' : 'solid 2px white',
+  '& .child': { 
+    color: selected ? '#37a' : '#222',
+    maxWidth: 180,
+    overflow: 'hidden',
+    whiteSpace: 'nowrap',
+    textOverflow: 'ellipsis',
+  },
+  '& .btn': {
+    marginLeft: 8,
+    width: 16
+  }
+}))
+
+export const Tabs = ({items, value, removeTab, onChange, ...props}) => {
+  if (!items?.length) {
+    return '';
+  }
+
+  return <Flex>
+    {items.map((child, o) => <Tooltip key={o} title={child}><Tab selected={o === value}>
+      <Box className="child" onClick={e => onChange(false, o)}>{child}</Box>
+      {o > 0 && <Close onClick={() => removeTab(child)} className="btn"/>}
+      </Tab></Tooltip>)}
+  </Flex>
+  
+}
  
 
 export const StyledPagination = ({ totalPages, page, handleChange }) => {

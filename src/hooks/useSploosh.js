@@ -29,8 +29,8 @@ export default function useSploosh ({ queryType, pageIndex }) {
     const removeTab = (p) => {
       const tabs = searches.filter (t => t.param !== p) 
       setState('param', null)
-      setState('searches', tabs)
-      navigate(`/`) 
+      setState('searches', tabs) 
+      navigate(`/video/1`) ;
     };
   
     const locate = (p) => {
