@@ -5,7 +5,7 @@ const Backdrop = styled('div')(({ shown }) => ({
   width: '100vw',
   height: '100vh',
   backgroundColor: 'rgba(0,0,0,0.2)',
-  position: 'absolute',
+  position: 'fixed',
   top: 0,
   left: 0,
   display: shown ? 'block' : 'none'
