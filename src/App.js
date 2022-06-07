@@ -33,11 +33,7 @@ function VideoGrid (props) {
   const tabValue = searches?.map(f => f.param).indexOf(queryParam) + 1;
  
   const handleChange = (event, newValue) => {
-    if (newValue === 0) navigate(`/video/1`)  
-    if (newValue === searches.length + 1) { 
-      const doomed = searches[tabValue - 1].param;
-      return removeTab(doomed)
-    }
+    if (newValue === 0) navigate(`/video/1`)   
     const s = searches[newValue - 1];
     navigate(`/search/${s.param}/1`)  
   };
