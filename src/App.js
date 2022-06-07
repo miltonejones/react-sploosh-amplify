@@ -74,7 +74,7 @@ function VideoGrid (props) {
             alert (`Search ${value.param} was saved`)
           }} />
 
-          <Favorite sx={{ml: 2, color: queryParam.indexOf('*') > 0 ? 'red' : 'black'}} onClick={async () => {
+          <Favorite sx={{ml: 2, color: queryParam?.indexOf('*') > 0 ? 'red' : 'black'}} onClick={async () => {
             const value = searches[tabValue - 1]; 
             const heart = queryParam.indexOf('*') > 0 
               ? rawParam
