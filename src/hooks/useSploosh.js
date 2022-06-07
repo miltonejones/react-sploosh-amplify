@@ -26,11 +26,11 @@ export default function useSploosh ({ queryType, pageIndex }) {
     const { modelModalState, showDialog } = useModelModal();
   
     const prefix = !queryParam ? '' : `/${queryParam}`
-    const removeTab = (p) => {
+    const removeTab = (p, selectedTab) => {
       const tabs = searches.filter (t => t.param !== p) 
       setState('param', null)
       setState('searches', tabs) 
-      navigate(`/video/1`) ;
+      !!selectedTab && navigate(`/video/1`) ;
     };
   
     const locate = (p) => {

@@ -47,7 +47,7 @@ export const Tabs = ({items, value, removeTab, onChange, ...props}) => {
   return <Flex>
     {items.map((child, o) => <Tooltip key={o} title={child}><Tab selected={o === value}>
       <Box className="child" onClick={e => onChange(false, o)}>{child}</Box>
-      {o > 0 && <Close onClick={() => removeTab(child)} className="btn"/>}
+      {o > 0 && <Close onClick={() => removeTab(child, o === value)} className="btn"/>}
       </Tab></Tooltip>)}
   </Flex>
   
