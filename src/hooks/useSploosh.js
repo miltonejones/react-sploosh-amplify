@@ -47,11 +47,12 @@ export default function useSploosh ({ queryType, pageIndex }) {
     };
   
     const locate = (p) => {
-      const tabs = searches.find (t => t.param === p)
+      const raw = p.replace('*', '');
+      const tabs = searches.find (t => t.param === raw)
         ? searches 
         : searches.concat({
           type: 'search',
-          param: p
+          param: raw
         })
       setState('param', p)
       setState('searches', tabs)
