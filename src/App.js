@@ -50,6 +50,7 @@ function VideoGrid (props) {
     setState(s =>  ({...s, loaded: 1}))
   }, [loaded])
 
+  // adding token change
 
   return (
     <SplooshContext.Provider value={{ ...sploosh }}>
