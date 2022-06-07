@@ -31,7 +31,7 @@ function VideoGrid (props) {
     loaded,
     removeTab 
   } = sploosh;
-  const rawParam = queryParam.replace('*', '')
+  const rawParam = queryParam?.replace('*', '')
   const tabValue = searches?.map(f => f.param).indexOf(rawParam) + 1;
  
   const handleChange = (event, newValue) => {
