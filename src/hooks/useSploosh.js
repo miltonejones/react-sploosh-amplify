@@ -7,11 +7,15 @@ import {
   } from "react-router-dom";
 import { useModelModal} from '../components'
 import useModelStorage from './useModalStorage';
+import dynamoStorage from '../services/DynamoStorage';
+ 
 
 export const SplooshContext = React.createContext()
 
 
 export default function useSploosh ({ queryType, pageIndex }) {
+  const store = dynamoStorage();
+
     let navigate = useNavigate();
     const { videoPageNum = 1, queryParam } = useParams();
     const gridType = !queryParam ? 'video' : 'search';
@@ -22,14 +26,23 @@ export default function useSploosh ({ queryType, pageIndex }) {
       busy: false, 
       searches: []
     });
-    const { page, param, collectionType, searches, busy } = state;
+    const { page, param, collectionType, searches, busy, search_check } = state;
     const { modelModalState, showDialog } = useModelModal();
+
+    React.useEffect(() => {
+      !searches?.length && !search_check && (async () => {
+        const tabs = await store.getItem('search-tabs'); 
+        setState('search_check', !0)
+        setState('searches', !tabs ? [] : JSON.parse(tabs)) 
+      })();
+    }, [searches, search_check])
   
     const prefix = !queryParam ? '' : `/${queryParam}`
     const removeTab = (p, selectedTab) => {
       const tabs = searches.filter (t => t.param !== p) 
       setState('param', null)
       setState('searches', tabs) 
+      store.setItem('search-tabs', JSON.stringify(tabs));
       !!selectedTab && navigate(`/video/1`) ;
     };
   
@@ -42,6 +55,7 @@ export default function useSploosh ({ queryType, pageIndex }) {
         })
       setState('param', p)
       setState('searches', tabs)
+      store.setItem('search-tabs', JSON.stringify(tabs));
       navigate(`/search/${p}/1`) 
     };
   

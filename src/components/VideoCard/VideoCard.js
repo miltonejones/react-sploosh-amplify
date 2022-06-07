@@ -64,13 +64,19 @@ export default function VideoCard({ video, onClick, onSearch, getModel, small, o
     <Collapse in={showMenu}>
       
       <Flex style={{padding:12}}>
-        <IconButton onClick={() => onHeart(video.ID)}>
+        <IconButton onClick={() => {
+          onHeart(video.ID);
+          setShowMenu(false);
+          }}>
           <Favorite style={{ color: video.favorite ? 'red' : 'gray' }} /> 
         </IconButton>
-        <IconButton onClick={() => onDrop(video.ID, video.title)}>
+        <IconButton onClick={() => {
+          onDrop(video.ID, video.title);
+          setShowMenu(false);
+        }}>
           <DeleteForever /> 
         </IconButton>
-        <IconButton href={video.URL} target="_blank">
+        <IconButton onClick={() => setShowMenu(false)} href={video.URL} target="_blank">
           <Launch  /> 
         </IconButton>
       </Flex>
