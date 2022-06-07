@@ -16,9 +16,12 @@ import {
 import { Close } from '@mui/icons-material';
 
 
-const Flex = styled(Box)({
-  display: 'flex'
-})
+export const Flex = styled(Box)(({align = 'center', spaced, fullWidth}) => ({
+  display: 'flex',
+  alignItems: align,
+  width: fullWidth ? '100%' : 'inherit',
+  justifyContent: spaced ? 'space-between' : ''
+}))
 
 const Tab = styled(Box)(({selected}) => ({
   display: 'flex',
@@ -89,7 +92,7 @@ export const TextBox = ({onChange, onEnter, ...props}) => {
     />)
 }
 
-export const SystemDialog = ({open, title, onYes, onNo, onClose, message, prompt}) => {
+export const SystemDialog = ({open, title, onYes, onNo, onClose, message, prompt, defaultValue}) => {
   const [value, setValue] = React.useState('');
   const whenYes = () => {
     if (prompt) {
@@ -112,7 +115,7 @@ export const SystemDialog = ({open, title, onYes, onNo, onClose, message, prompt
         <DialogContentText sx={{mb: 1}} id="alert-dialog-description">
         {message}
         </DialogContentText>
-        {!!prompt && <TextBox onEnter={onYes} onChange={setValue} />}
+        {!!prompt && <TextBox value={defaultValue} onEnter={onYes} onChange={setValue} />}
       </Stack>
     </DialogContent>
     <DialogActions>

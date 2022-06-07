@@ -1,55 +1,65 @@
+import dynamoStorage from "./DynamoStorage";
+
+ 
+
+
 class SearchPersistService$ {
 
     searchParam = '';
     savedParams = '';
-    cookieName = 'saved-video-app-searches';
+    cookieName = 'saved-video-app-searches-db';
+    store = dynamoStorage()
     // onChange);
     // onDrop); 
   
-    exists(value) {
-      return this.getSavedSearches().filter((f) => f === value).length;
+    async exists(value) {
+      const searches = await this.getSavedSearches();
+      return searches.filter((f) => f === value).length;
     }
   
-    getSavedSearches() {
-      const cookieData = localStorage[this.cookieName];
+    async getSavedSearches() {
+      const cookieData = await this.store.getItem(this.cookieName);  
       if (cookieData?.length) {
+        console.log ({cookieData})
         const searchObject = JSON.parse(cookieData);
         if (searchObject?.length) {
           return searchObject;
         }
-      }
+      } 
+      await this.store.setItem(this.cookieName, JSON.stringify(SEARCH_SEED))
       return SEARCH_SEED;
     }
   
-    dropSearch(value) {
-      const existed = this.getSavedSearches().filter((f) => f !== value);
-      this.save(existed);
-      // this.onDrop.emit(existed);
-      // this.onChange.emit(existed);
+    async dropSearch(value) {
+      const searches = await this.getSavedSearches(); 
+      await this.save(searches.filter((f) => f !== value)); 
     }
   
-    updateSearch(oldvalue, newvalue) {
-      const existed = this.getSavedSearches().filter((f) => f !== oldvalue);
-      existed.push(newvalue);
-      this.save(existed);
+    async updateSearch(oldvalue, newvalue) {
+      const searches = await this.getSavedSearches(); 
+      await this.save(searches.filter((f) => f !== oldvalue).concat(newvalue));
     }
   
-    editSearch(value) {
-      const existed = this.getSavedSearches().filter((f) => f !== value);
-      const updated = prompt('Enter new value:', value);
+    async pinSearch(value) {
+      const searches = await this.getSavedSearches();
+      const newvalue = value.indexOf('^') > 0 ? value.replace('^', '') : `${value}^`;
+      await this.save(searches.filter((f) => f !== value).concat(newvalue));
+    }
+  
+    async editSearch(updated, value) {
+      const searches = await this.getSavedSearches();
+      const existed = searches.filter((f) => f !== value); 
       existed.push(updated);
-      this.save(existed);
-      // this.onChange.emit(updated);
+      this.save(existed); 
     }
   
-    save(param) {
-      localStorage[this.cookieName] = JSON.stringify(param);
+    async save(param) {
+      await this.store.setItem(this.cookieName, JSON.stringify(param)) 
     }
   
-    saveSearch(value) {
-      const param = this.getSavedSearches();
-      param.push(value);
-      this.save(param);
+    async saveSearch(value) {
+      const param = await this.getSavedSearches(); 
+      await this.save(param.concat(value));
       console.log(param, 'saved');
     }
   }
