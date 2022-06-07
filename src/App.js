@@ -5,7 +5,7 @@ import useComponentState from './hooks/useComponentState';
 import InputAdornment from '@mui/material/InputAdornment';
 import {Tabs, Flex, VideoCollection, ModelGrid, SearchDrawer, Toolbar, ModelModal } from './components'; 
 import { Box , Tab, Collapse } from '@mui/material';
-import { Close, Save } from '@mui/icons-material';
+import { Close, Save, Favorite } from '@mui/icons-material';
 import { 
   BrowserRouter,  
   Routes, 
@@ -31,7 +31,8 @@ function VideoGrid (props) {
     loaded,
     removeTab 
   } = sploosh;
-  const tabValue = searches?.map(f => f.param).indexOf(queryParam) + 1;
+  const rawParam = queryParam.replace('*', '')
+  const tabValue = searches?.map(f => f.param).indexOf(rawParam) + 1;
  
   const handleChange = (event, newValue) => {
     if (newValue === 0) navigate(`/video/1`)   
@@ -49,6 +50,7 @@ function VideoGrid (props) {
     setState(s =>  ({...s, loaded: 1}))
   }, [loaded])
 
+  // adding token change
 
   return (
     <SplooshContext.Provider value={{ ...sploosh }}>
@@ -70,6 +72,14 @@ function VideoGrid (props) {
             const value = searches[tabValue - 1]; 
             await SearchPersistService.saveSearch(value.param)
             alert (`Search ${value.param} was saved`)
+          }} />
+
+          <Favorite sx={{ml: 2, color: queryParam.indexOf('*') > 0 ? 'red' : 'black'}} onClick={async () => {
+            const value = searches[tabValue - 1]; 
+            const heart = queryParam.indexOf('*') > 0 
+              ? rawParam
+              : queryParam + '*';
+            locate(heart);
           }} />
          </Flex>
         </Collapse>
