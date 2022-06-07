@@ -3,12 +3,22 @@ import RegionMenu from './RegionMenu/RegionMenu';
 import ModelModal, { useModelModal } from './ModelModal/ModelModal';
 import VideoCollection from './VideoCollection/VideoCollection';
 import SearchDrawer from './SearchDrawer/SearchDrawer';
+import VideoDrawer from './VideoDrawer/VideoDrawer';
 import ModelGrid from './ModelGrid/ModelGrid';
 import ModelCard from './ModelCard/ModelCard';
 import ModelSelect from './ModelSelect/ModelSelect';
 import FabGroup from './FabGroup/FabGroup';
 import Toolbar from './Toolbar/Toolbar';
-import { StyledPagination, SystemDialog, useSystemDialog, Flex, Tabs } from './Control/Control';
+import { 
+  StyledPagination, 
+  SystemDialog, 
+  useSystemDialog, 
+  Flex, 
+  Tabs ,
+  UL,
+  LI,
+  TextBox
+  } from './Control/Control';
 
 export {
   VideoCard,
@@ -28,5 +38,9 @@ export {
   ModelSelect,
   Toolbar,
   Tabs,
-  useSystemDialog
+  TextBox,
+  VideoDrawer,
+  useSystemDialog,
+  UL,
+  LI
 };

@@ -23,9 +23,10 @@ import {
   SystemDialog, 
   useSystemDialog 
 } from '../';
-import { TextField, Box, Button, IconButton } from '@mui/material';
-import { Sync, Add, VideoLabel, Close } from '@mui/icons-material';
+import { TextField, Box, Button, IconButton, Badge } from '@mui/material';
+import { Sync, Add, VideoLabel, Close, Edit, CheckBox } from '@mui/icons-material';
 import './VideoCollection.css';
+import VideoDrawer from '../VideoDrawer/VideoDrawer';
 
 
 
@@ -45,6 +46,13 @@ export default function VideoCollection(props) {
     systemDialogState, 
     collectionType,
     Prompt,
+    closeVideoPanel,
+    openVideoPanel,
+    selectVideo,
+    selectedVideos,
+    candidateVideos,
+    toggleEditMode,
+    editMode,
     onHeart,
     onDrop
   } = useVideoCollection(props);
@@ -83,7 +91,21 @@ export default function VideoCollection(props) {
       onClick: () => WindowManager.focus()
     }
   ]
+
+  const EditIcon = !!editMode
+    ? <Badge color="primary" badgeContent={candidateVideos?.length}><CheckBox className={iconClass} /></Badge>
+    : <Edit className={iconClass} />
   const editButtons = [
+    {
+      icon:  EditIcon,
+      onClick: () => {
+        if (candidateVideos?.length) {
+          openVideoPanel()
+          return;
+        }
+        toggleEditMode()
+      }
+    },
     {
       icon:  <Sync className={iconClass} />,
       onClick: refreshList
@@ -111,10 +133,13 @@ export default function VideoCollection(props) {
       </Box>
       <Box className="App">
         <div className="ThumbnailGrid">
-          {records?.map((video) => (
+          {records?.filter(f => !!f && f.ID).map((video) => (
             <VideoCard
               key={video.ID}
               video={video}
+              onClick={selectVideo}
+              selected={!!selectedVideos?.length && selectedVideos.some(f => !!f && f.ID === video.ID)}
+              chosen={!!candidateVideos?.length && candidateVideos.some(f => !!f && f.ID === video.ID)}
               getModel={(q) => {
                 showDialog(q);
               }}
@@ -141,6 +166,7 @@ export default function VideoCollection(props) {
         icon={<Add />}
         buttons={fabButtons}
       />
+      <VideoDrawer onClose={closeVideoPanel} refreshList={refreshList}  />
     </>
   );
 }
@@ -163,7 +189,13 @@ function useVideoCollection({
 
 
   const {
-    modelModalState, showDialog
+    modelModalState, 
+    showDialog, 
+    candidateVideos,
+    selectedVideos, 
+    selectVideo, 
+    editMode,
+    setState: setComponentState
 } = React.useContext(SplooshContext);
  
   const { systemDialogState, Prompt, Confirm } = useSystemDialog()
@@ -179,6 +211,13 @@ function useVideoCollection({
     navigate && navigate(href);
   };
 
+  const handleClick = (video) => {
+     const existing = selectedVideos || [];
+     const updated = existing.some(f => f.ID === video.ID)
+      ? existing.filter(f => f.ID !== video.ID)
+      : existing.concat(video)
+  };
+
   
   const loadVideos = React.useCallback(
     async (p, f) => {
@@ -188,6 +227,7 @@ function useVideoCollection({
       setState('response', { ...items, searchKey: searchKey$ });
       setState('page', p);
       setState('searchKey', searchKey$);
+      refreshSelectedVideos(items);
     },
     [page]
   );
@@ -201,6 +241,7 @@ function useVideoCollection({
       setState('response', { ...items, searchKey: searchKey$ });
       setState('page', p);
       setState('searchKey', searchKey$);
+      refreshSelectedVideos(items);
     },
     [page]
   );
@@ -221,6 +262,7 @@ function useVideoCollection({
         setState('page', p);
         console.log (videos)
         setState('searchKey', searchKey$);
+        refreshSelectedVideos(items);
     }
   )
 
@@ -233,9 +275,25 @@ function useVideoCollection({
       setState('page', p);
       setState('param', str);
       setState('searchKey', searchKey$);
+      refreshSelectedVideos(items);
     },
     [page]
   );
+
+  const refreshSelectedVideos = (res) => {
+    const { records } = res;
+    
+    console.log ({ records, selectedVideos });
+
+    const updated = selectedVideos.map(f => records.find(e => e.ID === f.ID));
+    setComponentState('selectedVideos', updated)
+    setComponentState('candidateVideos', [])
+    setComponentState('editMode', false)
+  }
+
+  const toggleEditMode = () => { 
+    setComponentState('editMode', !editMode)
+  }
 
   const load = React.useCallback(
     async (p, t, s) => {
@@ -287,10 +345,22 @@ function useVideoCollection({
     (!!renew || !response.records) && load(pageNum, collectionType, searchParam);
   }, [response, busy, pageNum, page, collectionType, type, param, searchParam]);
 
+  const closeVideoPanel = () => {
+    setComponentState('candidateVideos', []);
+    setComponentState('editMode', false);
+    setComponentState('selectedVideos', []);
+  }
+
+  const openVideoPanel = () => { 
+    setComponentState('selectedVideos', candidateVideos)
+  }
+
   // const { count, records } = response;
   // if (!records) return 'Loading...';
   // const totalPages = Math.ceil(count / 30);
   return {
+    closeVideoPanel,
+    openVideoPanel,
     response,
     searchParam,
     pageNum,
@@ -306,6 +376,11 @@ function useVideoCollection({
     collectionType,
     Prompt,
     onHeart,
-    onDrop
+    onDrop,
+    selectVideo,
+    toggleEditMode,
+    editMode,
+    candidateVideos,
+    selectedVideos
   };
 }

@@ -77,6 +77,15 @@ export const getModelsByName = async (name) => {
 }
 
 
+export const removeModelFromVideo = async (trackFk, modelFk) => {
+  const requestOptions = {
+    method: "DELETE",
+  };
+  const response = await fetch(API_ENDPOINT + `/model/cast/${trackFk}/${modelFk}`, requestOptions);
+  return await response.json();
+};
+
+
 export const addModelToVideo = async (trackFk, modelFk) => {
   const requestOptions = {
     method: "PUT",
@@ -84,6 +93,17 @@ export const addModelToVideo = async (trackFk, modelFk) => {
     body: JSON.stringify({ trackFk, modelFk }),
   };
   const response = await fetch(API_ENDPOINT + '/model/cast', requestOptions);
+  return await response.json();
+};
+
+
+
+export const addModel = async (name) => {
+  const requestOptions = {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" } 
+  };
+  const response = await fetch(API_ENDPOINT + `/model/cast/${name}`, requestOptions);
   return await response.json();
 };
 

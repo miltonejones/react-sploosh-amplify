@@ -8,12 +8,12 @@ import { CardActionArea, Collapse } from '@mui/material';
 import Tooltip from '@mui/material/Tooltip';
 import { RegionMenu } from '../';
 // import { WindowManagerService } from '../../services/WindowManager';
-import { Favorite, DeleteForever, Launch, MoreVert } from '@mui/icons-material';
+import { Favorite, DeleteForever, Launch, MoreVert, MenuBook } from '@mui/icons-material';
 import { useWindowManager } from '../../services/WindowManager';
 
 const ERR_IMAGE = 'https://s3.amazonaws.com/sploosh.me.uk/assets/XXX.jpg';
 
-export default function VideoCard({ video, onClick, onSearch, getModel, small, onDrop, onHeart }) {
+export default function VideoCard({ video, onClick, onSearch, getModel, small, onDrop, onHeart, selected, chosen }) {
   const [open, setOpen] = React.useState(false);
   const [src, setSrc] = React.useState(ERR_IMAGE);
   const [showModels, setShowModels] = React.useState(false);
@@ -39,7 +39,11 @@ export default function VideoCard({ video, onClick, onSearch, getModel, small, o
   const visited = WindowManager.visited(video);
   const opacity = visited ? 0.5 : 1;
   return (
-    <Card sx={{ maxWidth: 345, opacity, position: 'relative' }} elevation={video.favorite ? 6 : 1}>
+    <Card sx={{ 
+      maxWidth: 345, 
+      opacity, 
+      outline: selected || chosen ? '3px dotted #37a' : '',
+      position: 'relative' }} elevation={video.favorite ? 6 : 1}>
       <CardActionArea>
         <Tooltip title={video.title}> 
             <CardMedia
@@ -79,6 +83,11 @@ export default function VideoCard({ video, onClick, onSearch, getModel, small, o
         <IconButton onClick={() => setShowMenu(false)} href={video.URL} target="_blank">
           <Launch  /> 
         </IconButton>
+       {!!video.Key && <IconButton  
+       onClick={() => setShowMenu(false)}
+        href={`https://www.javlibrary.com/en/vl_searchbyid.php?keyword=${video.Key}`} target="_blank">
+          <MenuBook  /> 
+        </IconButton>}
       </Flex>
 
       </Collapse>
@@ -99,7 +108,7 @@ export default function VideoCard({ video, onClick, onSearch, getModel, small, o
               classes={{root: video.favorite ? "favorite" : ""}}
             >
               <Shorten limit={!!video.models.length ? 35 : 50}>
-                {video.title}
+               {video.title}
               </Shorten>
             </Typography>
           </Flex>
