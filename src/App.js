@@ -67,20 +67,24 @@ function VideoGrid (props) {
             value={tabValue} 
             items={["All Videos"].concat(searches?.map(s => s.param))}
             />
-          
-          <Save onClick={async () => {
-            const value = searches[tabValue - 1]; 
-            await SearchPersistService.saveSearch(value.param)
-            alert (`Search ${value.param} was saved`)
-          }} />
 
-          <Favorite sx={{ml: 2, color: queryParam?.indexOf('*') > 0 ? 'red' : 'black'}} onClick={async () => {
-            const value = searches[tabValue - 1]; 
-            const heart = queryParam.indexOf('*') > 0 
-              ? rawParam
-              : queryParam + '*';
-            locate(heart);
-          }} />
+            {!!queryParam && <>
+              <Save onClick={async () => {
+                const value = searches[tabValue - 1]; 
+                await SearchPersistService.saveSearch(value.param)
+                alert (`Search ${value.param} was saved`)
+              }} />
+
+                <Favorite sx={{ml: 2, color: queryParam?.indexOf('*') > 0 ? 'red' : 'black'}} onClick={async () => {
+                  const value = searches[tabValue - 1]; 
+                  const heart = queryParam.indexOf('*') > 0 
+                    ? rawParam
+                    : queryParam + '*';
+                  locate(heart);
+                }} />
+            </>}
+          
+
          </Flex>
         </Collapse>
 
