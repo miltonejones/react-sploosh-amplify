@@ -80,14 +80,14 @@ export const TextBox = ({onChange, onEnter, ...props}) => {
   const [value, setValue] = React.useState(props.value);
   const change = e => {
     setValue(e.target.value);
-    onChange(e.target.value);
+    onChange && onChange(e.target.value, e);
   }
   return (<TextField   
     size="small"
     autoFocus
     {...props} 
     value={value}
-    onKeyUp={(e) => e.keyCode === 13 && onEnter(value)}
+    onKeyUp={(e) => e.keyCode === 13 && onEnter && onEnter(value, e)}
     onChange={change}
     />)
 }
@@ -169,3 +169,40 @@ export function useSystemDialog() {
 }
 
 
+
+export const UL = styled('ul')({
+  padding: 0,
+  margin: 0,
+  listStyle: 'none'
+})
+
+export const LI = styled('li')(({ header, dense }) => ({
+  display: 'flex',
+  alignItems: 'center',
+  position: 'relative', 
+  padding: header ? '16px 8px' : (dense ? 2 : 8),
+  cursor: 'pointer',
+  '& .titlebox': {
+    maxWidth: 300,
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
+  },
+  '& .menubox': {
+    cursor: 'pointer',
+    position: 'absolute',
+    right: 8,
+    display: 'flex',
+    gap: 8,
+    opacity: 0
+  },
+  '&:hover': {
+    textDecoration: 'underline',
+    '& .menubox': {
+      opacity: 0.3,
+      '&:hover': {
+        opacity: 1
+      },
+    },
+  },
+}))

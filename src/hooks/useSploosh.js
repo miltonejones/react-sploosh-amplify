@@ -24,9 +24,12 @@ export default function useSploosh ({ queryType, pageIndex }) {
       param: queryParam,
       collectionType: queryType || gridType,
       busy: false, 
-      searches: []
+      searches: [],
+      editMode: false,
+      selectedVideos: [],
+      candidateVideos: []
     });
-    const { page, param, collectionType, searches, busy, search_check } = state;
+    const { page, param, collectionType, searches, busy, search_check, selectedVideos, candidateVideos, editMode } = state;
     const { modelModalState, showDialog } = useModelModal();
 
     React.useEffect(() => {
@@ -35,7 +38,19 @@ export default function useSploosh ({ queryType, pageIndex }) {
         setState('search_check', !0)
         setState('searches', !tabs ? [] : JSON.parse(tabs)) 
       })();
-    }, [searches, search_check])
+    }, [searches, search_check]);
+
+    
+
+    const selectVideo = (video) => {
+      const videos = editMode ? candidateVideos : selectedVideos;
+      const existing = videos || [];
+      const updated = existing.some(f => f.ID === video.ID)
+        ? existing.filter(f => f.ID !== video.ID)
+        : existing.concat(video); 
+      setState(editMode ? 'candidateVideos' : 'selectedVideos', updated); 
+    };
+    
   
     const prefix = !queryParam ? '' : `/${queryParam}`
     const removeTab = (p, selectedTab) => {
@@ -95,6 +110,10 @@ export default function useSploosh ({ queryType, pageIndex }) {
       pageNames,
       pageIndex,
       modelModalState, 
+      selectVideo,
+      candidateVideos,
+      editMode,
+      selectedVideos,
       showDialog,
       ...state
     }

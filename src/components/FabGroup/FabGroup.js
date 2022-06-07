@@ -55,7 +55,7 @@ return <><Box
       right: 28,
       bottom 
     }
-    return <IconButton color={button.color} style={buttonStyle} onClick={(w) => {
+    return <IconButton key={i} color={button.color} style={buttonStyle} onClick={(w) => {
       setOn(false);
       button.onClick(w);
     }}>{button.icon}</IconButton>

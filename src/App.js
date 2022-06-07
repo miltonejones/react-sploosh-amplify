@@ -3,7 +3,8 @@ import './style.css';
 import { SearchPersistService } from './services/SearchPersist';
 import useComponentState from './hooks/useComponentState';
 import InputAdornment from '@mui/material/InputAdornment';
-import {Tabs, Flex, VideoCollection, ModelGrid, SearchDrawer, Toolbar, ModelModal } from './components'; 
+import {Tabs, Flex, VideoCollection, ModelGrid, SearchDrawer, 
+    Toolbar, ModelModal } from './components'; 
 import { Box , Tab, Collapse } from '@mui/material';
 import { Close, Save, Favorite } from '@mui/icons-material';
 import { 
@@ -13,6 +14,7 @@ import {
 } from "react-router-dom";
 import useSploosh, { SplooshContext } from './hooks/useSploosh';
 import  { getModelsByName } from './connector/DbConnector';
+import { VideoDrawer } from './components';
 
 function VideoGrid (props) {
   const sploosh = useSploosh(props);
@@ -24,8 +26,9 @@ function VideoGrid (props) {
     navigate,
     queryParam,
     searches,
-    locate,
+    locate, 
     searchDrawerOpen,
+    videoDrawerOpen,
     modelModalState, 
     pageIndex,
     loaded,
@@ -89,9 +92,11 @@ function VideoGrid (props) {
         </Collapse>
 
         {/* video grid */}
-        <Component {...args} />
+        <Component {...args} /> 
 
         <ModelModal {...modelModalState} />
+ 
+
 
         {/* search drawer */}
         <SearchDrawer 

@@ -2,7 +2,7 @@ import * as React from 'react';
 import { SearchPersistService } from '../../services/SearchPersist';
 import Drawer from '@mui/material/Drawer'; 
 import { styled } from '@mui/material';
-import { Edit, PushPin, Delete, Sync } from '@mui/icons-material';
+import { Edit, PushPin, Delete, Refresh } from '@mui/icons-material';
 
 import { 
   SystemDialog, 
@@ -97,7 +97,7 @@ export default function SearchDrawer ({open, onClose, onClick}) {
 
 
 <div className="menubox">
-              <Sync onClick={async() => {
+              <Refresh onClick={async() => {
                    const existing = await SearchPersistService.getSavedSearches();
                    setSearches(existing)
               }} />
