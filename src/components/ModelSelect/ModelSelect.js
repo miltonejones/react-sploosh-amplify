@@ -6,7 +6,7 @@ import { TextBox, UL, LI } from '../';
 import { getModelsByName } from '../../connector/DbConnector';
  
  
-export default function ModelSelect({ onSelect, onCreate }) {
+export default function ModelSelect({ onSelect, onCreate, onMultiple }) {
   const theme = useTheme();
   const [anchorEl, setAnchorEl] = React.useState(null); 
   const [open, setOpen] = React.useState(false); 
@@ -36,13 +36,33 @@ export default function ModelSelect({ onSelect, onCreate }) {
     handleClose()
   }
 
+  const collateNames = name => ((out) => {
+    const parts = name.split(' ');
+    parts.map((part, o) => {
+      if (o % 2 !== 0) return;
+      out.push(`${part} ${parts[o + 1]}`);
+    });
+    return out;
+  })([]);
 
+// Kirioka Satsuki Yabe Hisae Endou Shihori
   const getModels = async (name, event) => {
-    const models = await getModelsByName(name)
-    setParam(name)
-    setStars(models)
-    handleClick(event)
-    setOpen(true)
+    const names = collateNames(name);
+    
+    if (names.length === 1) {
+      const models = await getModelsByName(name)
+      setParam(name)
+      setStars(models)
+      handleClick(event)
+      setOpen(true);
+      return;
+    }
+
+    Promise.all(names.map(n => getModelsByName(n))).then(e => {
+      const keys = e.filter(f => !!f?.length).map(f => f[0].ID);
+      onMultiple && onMultiple(keys); 
+    });
+  
   }
 
   return (
