@@ -9,13 +9,14 @@ import {
   Tooltip,
   Divider,
   Button,
+  IconButton,
   Typography,
   CardMedia 
 } from '@mui/material';
 import { styled, Drawer } from '@mui/material';
 import   { SplooshContext }  from '../../hooks/useSploosh';
 
-import { Add, Delete } from '@mui/icons-material';
+import { Add, Delete, MenuBook } from '@mui/icons-material';
 
 import { 
   SystemDialog, 
@@ -76,6 +77,15 @@ export default function VideoDrawer ({refreshList, onClose, onClick}) {
   }
 
 
+  const multiModel = async (modelList, index = 0) => {
+    if (index < modelList.length) {
+      const ID = modelList[index];  
+      const cast = await castModel(ID);
+      return await multiModel(modelList, ++index);
+    } 
+  }
+
+
   const dropModel = async (id) => {
     const cast = await removeModelFromVideo(videoOne.ID, id);
     refreshList && refreshList()
@@ -88,7 +98,21 @@ export default function VideoDrawer ({refreshList, onClose, onClick}) {
         open={drawerOpen}
         onClose={onClose}
         >
+          <Flex spaced sx={{pl: 1}}>
+            <Box>
+            Edit Video
+            </Box> 
+           {!!videoOne.Key && <IconButton    
+              href={`https://www.javlibrary.com/en/vl_searchbyid.php?keyword=${videoOne.Key}`} target="_blank"
+              ><MenuBook /></IconButton>}
+          </Flex>
+          
+          
+          <Divider />
+
+
           <Box sx={{p: 1}}>
+
 
           <Card sx={{maxWidth: 320}} elevation={1}>
             <CardActionArea>
@@ -143,7 +167,7 @@ export default function VideoDrawer ({refreshList, onClose, onClick}) {
      
         
 
-         {!videoRest.length && <ModelSelect onSelect={castModel} onCreate={createModel} />}
+         {!videoOne.models?.length && <ModelSelect onMultiple={multiModel} onSelect={castModel} onCreate={createModel} />}
           {!!videoRest.length && !!videoOne.models?.length && <Button onClick={() => castModels()} fullWidth variant="contained"
             >Add {videoOne.models?.length} model{videoOne.models?.length==1?'':'s'} to {selectedVideos.length} videos</Button>}
 
