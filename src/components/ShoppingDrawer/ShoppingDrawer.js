@@ -10,6 +10,7 @@ import {
   Typography,
   Collapse,
   Pagination,
+  LinearProgress,
   InputAdornment ,
   Stack
 } from '@mui/material';
@@ -29,7 +30,9 @@ import { getVideosByText } from '../../connector/ParserConnector';
 import { getVideoByURL } from '../../connector/ParserConnector';
 import { saveVideo } from '../../connector/DbConnector';
 import { getVideosByURL } from '../../connector/ParserConnector';
+import Observer from '../../services/Observer';
 
+export const importComplete = new Observer();
 
 const textBoxProps = {
   autoComplete: "off", 
@@ -144,6 +147,7 @@ export default function ShoppingDrawer ({open, onClose, onClick}) {
     searchResults, 
     showParsers, 
     minWidth ,
+    progress,
     selectedVideos,
     statusText
 } = state;
@@ -162,10 +166,14 @@ export default function ShoppingDrawer ({open, onClose, onClick}) {
     })()
   }, [parserList])
 
+  // const setProgress = (index, length) => setState({...state, progress: Math.ceil(((index + 1) / length) * 100)});
+
   const loopVideos = async (v, index = 0, out = []) => {
     if (index < selectedParsers.length) {
       const e = selectedParsers[index];
-      setState({...state, statusText: `Searching ${e}...`})
+      const p = Math.ceil(((index + 1) / selectedParsers.length) * 100);
+      // setProgress(index, selectedParsers.length);
+      setState({...state, progress: p, statusText: `Searching ${e}...`})
       const res = await getVideosByText(`http://${e}/`, v);
       out = out.concat(res.videos);
       return await loopVideos(v, ++index, out)
@@ -184,7 +192,8 @@ export default function ShoppingDrawer ({open, onClose, onClick}) {
       setState({...state, statusText: `Saving ${v}...`})
       const b = await getVideoByURL(v);
       const c = await saveVideo(b);
-      console.log ({ b, c })
+      console.log ({ b, c });
+      importComplete.next();
       setState({...state, statusText: 'Done', saveMode: !1}) 
       return;
     }
@@ -198,14 +207,17 @@ export default function ShoppingDrawer ({open, onClose, onClick}) {
   const saveEvery = async (index = 0) => {
     const { added = [] } = state;
     if (index < selectedVideos.length) {
+      const p = Math.ceil(((index + 1) / selectedVideos.length) * 100);
+      // setProgress(index, selectedVideos.length);
       const current = selectedVideos[index];
-      setState({...state, current, minWidth: 320, statusText: `Saving ${current}...` })
+      setState({...state, current, progress: p, minWidth: 320, statusText: `Saving ${current}...` })
       const b = await getVideoByURL(current);
       const c = await saveVideo(b);
       console.log ({ b, c })
       return await saveEvery(++index)
     }
     alert ('all items saved');
+    importComplete.next();
     resetState();
   }
 
@@ -232,7 +244,8 @@ export default function ShoppingDrawer ({open, onClose, onClick}) {
     current: null, 
     minWidth: 320,
     searchPage: 1,
-    statusText: 'Ready'
+    statusText: 'Ready',
+    progress: 0
   });
 
   const preview = !state.current ? null : searchResults.find(f => f.URL === state.current)
@@ -272,8 +285,13 @@ export default function ShoppingDrawer ({open, onClose, onClick}) {
 
         </Collapse>
 
-        <Text sx={{maxWidth: 300}} error variant="caption">{statusText}</Text>
+        <Box sx={{maxWidth: 300, overflow: 'hidden'}}><Text error variant="caption">{statusText}</Text></Box>
        
+      {/* [{progress}] */}
+      
+      {!!progress && <LinearProgress sx={{mb: 1}} variant="determinate" value={progress} />}
+      {!!preview && <Thumb res={preview} />}
+
         <Collapse sx={{mt: 2}} in={showParsers && !saveMode && !httpMode}>
           <Typography variant="caption" sx={{mb: 1}}>CHOOSE SITES TO SEARCH</Typography>
           <ParserList {...state} selectParser={selectParser}/>
@@ -301,8 +319,6 @@ export default function ShoppingDrawer ({open, onClose, onClick}) {
             </Box>
           </Flex>
         </Collapse>
- 
-       {!!preview && <Thumb res={preview} />}
 
        {!state.current &&  <Excel sx={{m: 1}}>
           {searchResults?.map && shown?.filter(f => !!f).map(res => <Thumb  

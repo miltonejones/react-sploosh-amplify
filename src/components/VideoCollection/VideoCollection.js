@@ -27,6 +27,7 @@ import { TextField, Box, Button, IconButton, Badge } from '@mui/material';
 import { Sync, Add, VideoLabel, Close, Edit, CheckBox } from '@mui/icons-material';
 import './VideoCollection.css';
 import VideoDrawer from '../VideoDrawer/VideoDrawer';
+import { importComplete } from '../ShoppingDrawer/ShoppingDrawer';
 
 
 
@@ -65,7 +66,14 @@ export default function VideoCollection(props) {
       setWindowLength(WindowManager.getLength())
     })
 
-    return () => sub.unsubscribe();
+    const im =  importComplete.subscribe(() => {
+      refreshList()
+    });
+
+    return () => {
+      sub.unsubscribe();
+      im.unsubscribe();
+    }
   })
 
   const iconClass = busy ? 'spin' : '';
