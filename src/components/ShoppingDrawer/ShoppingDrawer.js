@@ -182,17 +182,22 @@ export default function ShoppingDrawer ({open, onClose, onClick}) {
       setState({...state, parserList: p.filter(f => !!f.pageParser)})
     })()
   }, [parserList])
+ 
 
-  // const setProgress = (index, length) => setState({...state, progress: Math.ceil(((index + 1) / length) * 100)});
+  const loopVideos = async (v) => { 
+    setState({...state, minWidth: 320, statusText: `Finding videos like '${v}'...` })
+    return await findVideos(v)
+  }
 
-  const loopVideos = async (v, index = 0, out = []) => {
+
+  const findVideos = async (v, index = 0, out = []) => {
     if (index < selectedParsers.length) {
       const e = selectedParsers[index];
       const p = Math.ceil(((index + 1) / selectedParsers.length) * 100); 
       const res = await getVideosByText(`http://${e}/`, v);
       setState({...state, progress: p, statusText: `Searched ${e}...`})
       out = out.concat(res.videos);
-      return await loopVideos(v, ++index, out)
+      return await findVideos(v, ++index, out)
     }
     setState({...state, statusText: '', showParsers: !1, searchResults: out, minWidth: 960}) 
   }
@@ -235,7 +240,12 @@ export default function ShoppingDrawer ({open, onClose, onClick}) {
   const first = pageSize * (searchPage - 1);
   const shown = searchResults?.sort(timeSort).slice(first, first + pageSize);
 
-  const saveEvery = async (index = 0) => {
+  const saveEvery = async () => {
+    setState({...state, minWidth: 320, statusText: `Uploading ${selectedVideos.length} videos...` })
+    return await uploadEvery()
+  }
+
+  const uploadEvery = async (index = 0) => {
     const { added = [] } = state;
     if (index < selectedVideos.length) {
       const p = Math.ceil(((index + 1) / selectedVideos.length) * 100); 
@@ -243,7 +253,7 @@ export default function ShoppingDrawer ({open, onClose, onClick}) {
       const b = await getVideoByURL(current);
       const c = await saveVideo(b); 
       setState({...state, current, progress: p, minWidth: 320, statusText: `Saved ${current}...` })
-      return await saveEvery(++index)
+      return await uploadEvery(++index)
     } 
     importComplete.next();
     resetState();
@@ -298,7 +308,7 @@ export default function ShoppingDrawer ({open, onClose, onClick}) {
       <Divider />
 
 
-      <Box sx={{ p: 1, minWidth }}>
+      <Box sx={{ p: 1, minWidth, transition: "width 0.2s linear" }}>
       
       {!!searchPages && <Flex sx={{gap: 1}}>
         
@@ -308,7 +318,7 @@ export default function ShoppingDrawer ({open, onClose, onClick}) {
             onClick={() => pageTo(page[0])}
             key={page[1]}>{page[1]}</PageNum>)}</Flex>}
  
- {/* {JSON.stringify(searchPages)} */}
+ 
 
         <Collapse in={!searchResults?.length}>
 
