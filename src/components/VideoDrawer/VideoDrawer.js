@@ -29,6 +29,7 @@ import ModelSelect from '../ModelSelect/ModelSelect';
 import { addModelToVideo } from '../../connector/DbConnector';
 import { removeModelFromVideo } from '../../connector/DbConnector';
 import { addModel } from '../../connector/DbConnector';
+import { deleteVideo } from '../../connector/DbConnector';
 
 const Line = styled(Divider)({
   margin: '8px 0'
@@ -36,6 +37,7 @@ const Line = styled(Divider)({
 
 
 export default function VideoDrawer ({refreshList, onClose, onClick}) {
+  const { systemDialogState, Prompt, Confirm } = useSystemDialog();
 
   const {
     selectedVideos
@@ -83,6 +85,21 @@ export default function VideoDrawer ({refreshList, onClose, onClick}) {
       const cast = await castModel(ID);
       return await multiModel(modelList, ++index);
     } 
+  }
+
+  const multiDrop = async () => {
+    const ok = await Confirm(`Delete ${selectedVideos.length} videos?`);
+    if (!ok) return; 
+    execDrop()
+  }
+
+  const execDrop = async (index = 0) => {
+    if (index < selectedVideos.length) {
+      const video = selectedVideos[index];  
+      const cast = await deleteVideo(video.ID);
+      return await execDrop(++index);
+    } 
+    refreshList && refreshList()
   }
 
 
@@ -171,9 +188,13 @@ export default function VideoDrawer ({refreshList, onClose, onClick}) {
           {!!videoRest.length && !!videoOne.models?.length && <Button onClick={() => castModels()} fullWidth variant="contained"
             >Add {videoOne.models?.length} model{videoOne.models?.length==1?'':'s'} to {selectedVideos.length} videos</Button>}
 
+          {!!videoRest.length &&  <Button sx={{mt: 1}} onClick={() => multiDrop()} fullWidth color="error" variant="contained"
+            >Delete {selectedVideos.length} videos</Button>}
+
           </Box>
 
           {/* <pre>{JSON.stringify(selectedVideos,0,2)}</pre> */}
         </Drawer>
+        <SystemDialog {...systemDialogState}/>
   </>
 }
