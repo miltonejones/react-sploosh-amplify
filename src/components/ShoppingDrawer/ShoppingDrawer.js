@@ -185,7 +185,7 @@ export default function ShoppingDrawer ({open, onClose, onClick}) {
  
 
   const loopVideos = async (v) => { 
-    setState({...state, minWidth: 320, statusText: `Finding videos like '${v}'...` })
+    setState({...state, minWidth: 320, progress:1, statusText: `Finding videos like '${v}'...` })
     return await findVideos(v)
   }
 
@@ -211,10 +211,11 @@ export default function ShoppingDrawer ({open, onClose, onClick}) {
 
   const getVideos = async (v) => {
     if (httpMode) {
-      setState({...state, statusText: `Searching ${v}...`})
+      setState({...state, progress: 1, statusText: `Searching ${v}...`})
       const res = await getVideosByURL(v); 
       setState({
         ...state, 
+        progress: 0, 
         statusText: '', 
         searchText: v,
         searchPage: 1,
@@ -225,12 +226,12 @@ export default function ShoppingDrawer ({open, onClose, onClick}) {
       return;
     }
     if (saveMode) {
-      setState({...state, statusText: `Saving ${v}...`})
+      setState({...state, progress: 1, statusText: `Saving ${v}...`})
       const b = await getVideoByURL(v);
       const c = await saveVideo(b);
       console.log ({ b, c });
       importComplete.next();
-      setState({...state, statusText: '', saveMode: !1}) 
+      setState({...state, progress: 0, statusText: '', saveMode: !1}) 
       return;
     }
     return loopVideos(v) 
@@ -241,7 +242,7 @@ export default function ShoppingDrawer ({open, onClose, onClick}) {
   const shown = searchResults?.sort(timeSort).slice(first, first + pageSize);
 
   const saveEvery = async () => {
-    setState({...state, minWidth: 320, statusText: `Uploading ${selectedVideos.length} videos...` })
+    setState({...state, minWidth: 320, progress:1, statusText: `Uploading ${selectedVideos.length} videos...` })
     return await uploadEvery()
   }
 
@@ -284,7 +285,7 @@ export default function ShoppingDrawer ({open, onClose, onClick}) {
     searchPage: 1,
     statusText: '',
     searchPages: null,
-    progress: 0
+    progress: 0,
   });
 
   const preview = !state.current ? null : searchResults.find(f => f.URL === state.current)
@@ -328,6 +329,8 @@ export default function ShoppingDrawer ({open, onClose, onClick}) {
               label={saveMode ? "Add Video" : "Find Videos"} 
               placeholder="Search" 
               onEnter={getVideos} 
+              disabled={!!progress}
+              busy={progress}
             />
 
         </Collapse>
