@@ -55,12 +55,11 @@ const Frame = styled(Stack)(({selected }) => ({
   outline: selected ? 'dotted 2px #37a' : 'none' 
 }))
 
-const Text = styled(Typography)(({ fullWidth, error, maxWidth = 320 }) => ({
-  width: fullWidth ? '100%' : 140,
+const Text = styled(Typography)(({ fullWidth, error  }) => ({
+  maxWidth: fullWidth ? '300px' : '140px',
   whiteSpace: 'nowrap',
   textOverflow: 'ellipsis',
-  overflow: 'hidden',
-  maxWidth,
+  overflow: 'hidden', 
   color: !error ? 'black' : 'red'
 }))
  
@@ -181,6 +180,14 @@ export default function ShoppingDrawer ({open, onClose, onClick}) {
       setState({...state, statusText: 'Done', showParsers: !1, searchResults: res.videos, minWidth: 960}) 
       return;
     }
+    if (saveMode) {
+      setState({...state, statusText: `Saving ${v}...`})
+      const b = await getVideoByURL(v);
+      const c = await saveVideo(b);
+      console.log ({ b, c })
+      setState({...state, statusText: 'Done', saveMode: !1}) 
+      return;
+    }
     return loopVideos(v) 
   }
 
@@ -228,6 +235,8 @@ export default function ShoppingDrawer ({open, onClose, onClick}) {
     statusText: 'Ready'
   });
 
+  const preview = !state.current ? null : searchResults.find(f => f.URL === state.current)
+
 
   return <>
     <Drawer  
@@ -263,14 +272,14 @@ export default function ShoppingDrawer ({open, onClose, onClick}) {
 
         </Collapse>
 
-        <Text fullWidth error variant="caption">{statusText}</Text>
+        <Text sx={{maxWidth: 300}} error variant="caption">{statusText}</Text>
        
         <Collapse sx={{mt: 2}} in={showParsers && !saveMode && !httpMode}>
           <Typography variant="caption" sx={{mb: 1}}>CHOOSE SITES TO SEARCH</Typography>
           <ParserList {...state} selectParser={selectParser}/>
         </Collapse>
        
-        <Collapse in={!!searchResults?.length}>
+        <Collapse in={!state.current && !!searchResults?.length}>
          
           <Flex spaced>
             <Pagination  count={Math.ceil(searchResults?.length / pageSize)} page={searchPage} onChange={(x,y) => {
@@ -292,21 +301,14 @@ export default function ShoppingDrawer ({open, onClose, onClick}) {
             </Box>
           </Flex>
         </Collapse>
-        
-       
+ 
+       {!!preview && <Thumb res={preview} />}
 
        {!state.current &&  <Excel sx={{m: 1}}>
-          {searchResults?.map && shown?.filter(f => !!f).map(res => <Tooltip title={res.Text}><Frame 
+          {searchResults?.map && shown?.filter(f => !!f).map(res => <Thumb  
+            res={res}
             onClick={() => selectOne(res.URL)} 
-            selected={selectedVideos?.some(f => f === res.URL)}
-            sx={{padding: '0 10px', opacity: res?.existing ? 0.3 : 1}}>
-            <img key={res.Text} src={res.Photo} alt={res.Text} />
-            <Text variant="body2">{res.Text}</Text> 
-            <Flex spaced>
-              <Text variant="caption">{res.domain}</Text>
-              <Text variant="caption">{res.Time}</Text> 
-            </Flex>
-          </Frame></Tooltip>)}
+            selected={selectedVideos?.some(f => f === res.URL)}/>)}
         </Excel>}
  
       </Box>
@@ -315,4 +317,17 @@ export default function ShoppingDrawer ({open, onClose, onClick}) {
   </>
 
 
+}
+
+const Thumb = ({res, ...props}) => {
+  return <Tooltip title={res.Text}><Frame  
+    {...props}
+    sx={{padding: '0 10px', maxWidth: 140, opacity: res.existing ? 0.3 : 1}}>
+    <img key={res.Text} src={res.Photo} alt={res.Text} />
+    <Text variant="body2">{res.Text}</Text> 
+    <Flex spaced>
+      <Text variant="caption">{res.domain}</Text>
+      <Text variant="caption">{res.Time}</Text> 
+    </Flex>
+  </Frame></Tooltip>
 }
