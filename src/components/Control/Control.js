@@ -176,11 +176,12 @@ export const UL = styled('ul')({
   listStyle: 'none'
 })
 
-export const LI = styled('li')(({ header, dense }) => ({
+export const LI = styled('li')(({ header, dense, selected }) => ({
   display: 'flex',
   alignItems: 'center',
   position: 'relative', 
-  padding: header ? '16px 8px' : (dense ? 2 : 8),
+  padding: header ? '16px 8px' : (dense ? 2 : 8), 
+  fontWeight: selected ? '700' : '400',
   cursor: 'pointer',
   '& .titlebox': {
     maxWidth: 300,

@@ -108,3 +108,16 @@ export const addModel = async (name) => {
 };
 
 
+export const saveVideo = async (video) => {
+  const requestOptions = {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ ...video }),
+  };
+  try {
+    const response = await fetch(API_ENDPOINT + '/video', requestOptions);
+    return await response.json();
+  } catch (error) {
+    return { error }
+  }
+};

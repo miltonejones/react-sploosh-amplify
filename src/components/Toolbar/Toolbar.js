@@ -1,13 +1,13 @@
 import * as React from 'react';
 import { TextField, Box , Avatar, IconButton, InputAdornment } from '@mui/material';
-import { Search, Menu } from '@mui/icons-material';
+import { Search, Menu , Shop} from '@mui/icons-material';
 import { Flex, Spacer } from '../';
 import useSploosh, { SplooshContext }  from '../../hooks/useSploosh';
 import {  
     Link
   } from "react-router-dom";
 
-export default function Toolbar ({ viewIndex = 0}) {
+export default function Toolbar ({ viewIndex = 0, setOpen }) {
 
     // const sploosh = useSploosh({});
     const {
@@ -60,6 +60,9 @@ export default function Toolbar ({ viewIndex = 0}) {
             onKeyUp={(e) => e.keyCode === 13 && search()}
             onChange={(e) => setState('param', e.target.value)}
           />
+          <IconButton onClick={setOpen}>
+            <Shop />
+          </IconButton>
         </Flex>
       </Box>
 

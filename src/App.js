@@ -5,8 +5,8 @@ import useComponentState from './hooks/useComponentState';
 import InputAdornment from '@mui/material/InputAdornment';
 import {Tabs, Flex, VideoCollection, ModelGrid, SearchDrawer, 
     Toolbar, ModelModal } from './components'; 
-import { Box , Tab, Collapse } from '@mui/material';
-import { Close, Save, Favorite } from '@mui/icons-material';
+import { Box , Tab, Collapse, IconButton } from '@mui/material';
+import { Close, Save, Favorite , Shop} from '@mui/icons-material';
 import { 
   BrowserRouter,  
   Routes, 
@@ -15,6 +15,7 @@ import {
 import useSploosh, { SplooshContext } from './hooks/useSploosh';
 import  { getModelsByName } from './connector/DbConnector';
 import { VideoDrawer } from './components';
+import ShoppingDrawer from './components/ShoppingDrawer/ShoppingDrawer';
 
 function VideoGrid (props) {
   const sploosh = useSploosh(props);
@@ -60,7 +61,9 @@ function VideoGrid (props) {
       <Box className="App">
 
         {/* toolbar */}
-        <Toolbar viewIndex={pageIndex} />
+        <Toolbar viewIndex={pageIndex} videoDrawerOpen={videoDrawerOpen} setOpen={() => { 
+          setState('videoDrawerOpen', !videoDrawerOpen)
+        }} />
    
         {/* search tabs */}
         <Collapse className="head" in={!!searches.length}>
@@ -90,13 +93,17 @@ function VideoGrid (props) {
 
          </Flex>
         </Collapse>
-
+    
+    
         {/* video grid */}
         <Component {...args} /> 
 
-        <ModelModal {...modelModalState} />
- 
+        <ModelModal {...modelModalState} /> 
 
+        <ShoppingDrawer
+          onClose={() => setState('videoDrawerOpen', false)} 
+          open={videoDrawerOpen}
+        />
 
         {/* search drawer */}
         <SearchDrawer 
