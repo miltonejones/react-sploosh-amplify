@@ -27,7 +27,7 @@ export default function useSploosh ({ queryType, pageIndex }) {
       searches: [],
       editMode: false,
       selectedVideos: [],
-      candidateVideos: []
+      candidateVideos: [] 
     });
     const { page, param, collectionType, searches, busy, search_check, selectedVideos, candidateVideos, editMode } = state;
     const { modelModalState, showDialog } = useModelModal();

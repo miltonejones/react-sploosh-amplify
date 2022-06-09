@@ -42,7 +42,7 @@ export default function VideoDrawer ({refreshList, onClose, onClick}) {
   } = React.useContext(SplooshContext); 
 
   const drawerOpen = !!selectedVideos?.length;
-  if (!selectedVideos.length) return <i>no videos selected</i>
+  if (!selectedVideos.length) return <i/>
 
   const imageVideo = selectedVideos.find(f => !!f.models?.length)
   const videoOne = imageVideo || selectedVideos[0];
@@ -167,7 +167,7 @@ export default function VideoDrawer ({refreshList, onClose, onClick}) {
      
         
 
-         {!videoOne.models?.length && <ModelSelect onMultiple={multiModel} onSelect={castModel} onCreate={createModel} />}
+         <ModelSelect onMultiple={multiModel} onSelect={castModel} onCreate={createModel} />
           {!!videoRest.length && !!videoOne.models?.length && <Button onClick={() => castModels()} fullWidth variant="contained"
             >Add {videoOne.models?.length} model{videoOne.models?.length==1?'':'s'} to {selectedVideos.length} videos</Button>}
 
