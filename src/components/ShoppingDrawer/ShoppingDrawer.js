@@ -1,5 +1,6 @@
 import React from 'react';
 import { 
+  Avatar,
   Box, 
   Badge,
   TextField,
@@ -40,6 +41,14 @@ const textBoxProps = {
   // sx: { ml: 2, mt: 0.75}
 }
 
+const PageNum = styled(Avatar)(({ selected }) => ({
+  width: 32, 
+  height: 32, 
+  marginLeft: 4, 
+  fontSize: '.8rem', 
+  bgcolor: selected ? 'orange' : '',
+  cursor: 'pointer'
+}));
 
 const ParserList = ({ parserList: list, selectedParsers, selectParser }) => {
   if (!list?.length) {
@@ -66,8 +75,8 @@ const Text = styled(Typography)(({ fullWidth, error  }) => ({
   color: !error ? 'black' : 'red'
 }))
  
-const Status = styled(Box)(() => ({
-  maxWidth: 316,
+const Status = styled(Box)(({minWidth}) => ({
+  maxWidth: minWidth,
   whiteSpace: 'nowrap',
   textOverflow: 'ellipsis',
   overflow: 'hidden' 
@@ -156,7 +165,8 @@ export default function ShoppingDrawer ({open, onClose, onClick}) {
     minWidth ,
     progress,
     selectedVideos,
-    statusText
+    statusText,
+    searchPages
 } = state;
 
   const selectParser = (p) => {
@@ -187,11 +197,26 @@ export default function ShoppingDrawer ({open, onClose, onClick}) {
     setState({...state, statusText: '', showParsers: !1, searchResults: out, minWidth: 960}) 
   }
 
+  const pageTo = async(uri) => {
+    const { searchText } = state;
+    const domain = /(\w+:\/\/[^/]+)/.exec(searchText);
+    // alert (domain[0] + '+' + uri)
+    return await getVideos(domain[0] + uri)
+  }
+
   const getVideos = async (v) => {
     if (httpMode) {
       setState({...state, statusText: `Searching ${v}...`})
       const res = await getVideosByURL(v); 
-      setState({...state, statusText: '', showParsers: !1, searchResults: res.videos, minWidth: 960}) 
+      setState({
+        ...state, 
+        statusText: '', 
+        searchText: v,
+        searchPage: 1,
+        showParsers: !1, 
+        searchPages: res.pages, 
+        searchResults: res.videos, 
+        minWidth: 960}) 
       return;
     }
     if (saveMode) {
@@ -248,6 +273,7 @@ export default function ShoppingDrawer ({open, onClose, onClick}) {
     minWidth: 320,
     searchPage: 1,
     statusText: '',
+    searchPages: null,
     progress: 0
   });
 
@@ -274,7 +300,15 @@ export default function ShoppingDrawer ({open, onClose, onClick}) {
 
       <Box sx={{ p: 1, minWidth }}>
       
+      {!!searchPages && <Flex sx={{gap: 1}}>
+        
+        <Typography variant="caption">OTHER PAGES FOR THIS SEARCH</Typography>
+        
+        {searchPages.map(page => <PageNum
+            onClick={() => pageTo(page[0])}
+            key={page[1]}>{page[1]}</PageNum>)}</Flex>}
  
+ {/* {JSON.stringify(searchPages)} */}
 
         <Collapse in={!searchResults?.length}>
 
@@ -288,7 +322,7 @@ export default function ShoppingDrawer ({open, onClose, onClick}) {
 
         </Collapse>
 
-        <Status><Text error variant="caption">{statusText}</Text></Status>
+        <Status minWidth={minWidth}><Text error variant="caption">{statusText}</Text></Status>
        
       {/* [{progress}] */}
       
