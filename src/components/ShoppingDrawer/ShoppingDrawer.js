@@ -66,6 +66,13 @@ const Text = styled(Typography)(({ fullWidth, error  }) => ({
   color: !error ? 'black' : 'red'
 }))
  
+const Status = styled(Box)(() => ({
+  maxWidth: 316,
+  whiteSpace: 'nowrap',
+  textOverflow: 'ellipsis',
+  overflow: 'hidden' 
+}))
+ 
 const Excel = styled(Box)({
   display: 'grid',
   lineHeight: 1,
@@ -171,21 +178,20 @@ export default function ShoppingDrawer ({open, onClose, onClick}) {
   const loopVideos = async (v, index = 0, out = []) => {
     if (index < selectedParsers.length) {
       const e = selectedParsers[index];
-      const p = Math.ceil(((index + 1) / selectedParsers.length) * 100);
-      // setProgress(index, selectedParsers.length);
-      setState({...state, progress: p, statusText: `Searching ${e}...`})
+      const p = Math.ceil(((index + 1) / selectedParsers.length) * 100); 
       const res = await getVideosByText(`http://${e}/`, v);
+      setState({...state, progress: p, statusText: `Searched ${e}...`})
       out = out.concat(res.videos);
       return await loopVideos(v, ++index, out)
     }
-    setState({...state, statusText: 'Done', showParsers: !1, searchResults: out, minWidth: 960}) 
+    setState({...state, statusText: '', showParsers: !1, searchResults: out, minWidth: 960}) 
   }
 
   const getVideos = async (v) => {
     if (httpMode) {
       setState({...state, statusText: `Searching ${v}...`})
       const res = await getVideosByURL(v); 
-      setState({...state, statusText: 'Done', showParsers: !1, searchResults: res.videos, minWidth: 960}) 
+      setState({...state, statusText: '', showParsers: !1, searchResults: res.videos, minWidth: 960}) 
       return;
     }
     if (saveMode) {
@@ -194,7 +200,7 @@ export default function ShoppingDrawer ({open, onClose, onClick}) {
       const c = await saveVideo(b);
       console.log ({ b, c });
       importComplete.next();
-      setState({...state, statusText: 'Done', saveMode: !1}) 
+      setState({...state, statusText: '', saveMode: !1}) 
       return;
     }
     return loopVideos(v) 
@@ -207,16 +213,13 @@ export default function ShoppingDrawer ({open, onClose, onClick}) {
   const saveEvery = async (index = 0) => {
     const { added = [] } = state;
     if (index < selectedVideos.length) {
-      const p = Math.ceil(((index + 1) / selectedVideos.length) * 100);
-      // setProgress(index, selectedVideos.length);
+      const p = Math.ceil(((index + 1) / selectedVideos.length) * 100); 
       const current = selectedVideos[index];
-      setState({...state, current, progress: p, minWidth: 320, statusText: `Saving ${current}...` })
       const b = await getVideoByURL(current);
-      const c = await saveVideo(b);
-      console.log ({ b, c })
+      const c = await saveVideo(b); 
+      setState({...state, current, progress: p, minWidth: 320, statusText: `Saved ${current}...` })
       return await saveEvery(++index)
-    }
-    alert ('all items saved');
+    } 
     importComplete.next();
     resetState();
   }
@@ -244,7 +247,7 @@ export default function ShoppingDrawer ({open, onClose, onClick}) {
     current: null, 
     minWidth: 320,
     searchPage: 1,
-    statusText: 'Ready',
+    statusText: '',
     progress: 0
   });
 
@@ -285,7 +288,7 @@ export default function ShoppingDrawer ({open, onClose, onClick}) {
 
         </Collapse>
 
-        <Box sx={{maxWidth: 300, overflow: 'hidden'}}><Text error variant="caption">{statusText}</Text></Box>
+        <Status><Text error variant="caption">{statusText}</Text></Status>
        
       {/* [{progress}] */}
       
