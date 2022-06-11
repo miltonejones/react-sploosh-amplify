@@ -32,6 +32,7 @@ import { getVideoByURL } from '../../connector/ParserConnector';
 import { saveVideo } from '../../connector/DbConnector';
 import { getVideosByURL } from '../../connector/ParserConnector';
 import Observer from '../../services/Observer';
+import dynamoStorage from '../../services/DynamoStorage';
 
 export const importComplete = new Observer();
 
@@ -144,6 +145,24 @@ const wait = secs => new Promise(yes => {
   setTimeout(yes, secs * 999);
 })
 
+
+const useParserList = () => {  
+  const cookieName = 'selected-parser-items' 
+  const store = dynamoStorage();
+  const getParserList = async() => {
+    const list = await store.getItem(cookieName);  
+    return JSON.parse(list || '[]');
+  }
+  const setParserList = async(value) => {
+    await store.setItem(cookieName, JSON.stringify(value))  
+  }
+  return {  
+    getParserList,
+    setParserList 
+  }
+}
+
+
 /**
  * ShoppingDrawer 
  */
@@ -173,18 +192,24 @@ export default function ShoppingDrawer ({open, videoDrawerData, onClose, onClick
     statusText,
     searchPages
 } = state;
+  const {  
+    getParserList,
+    setParserList 
+  } = useParserList();
 
   const selectParser = (p) => {
     const updated = selectedParsers.some(f => f === p)
       ? selectedParsers.filter(f => f !== p)
       : selectedParsers.concat(p);
+    setParserList(updated);
     setState({...state, selectedParsers: updated})
   }
 
   React.useEffect(() => {
     !parserList.length && (async () => {
       const p = await getParsers();
-      setState({...state, parserList: p.filter(f => !!f.pageParser)})
+      const c = await getParserList();
+      setState({...state, selectedParsers: c, parserList: p.filter(f => !!f.pageParser)})
     })()
   }, [parserList])
  
