@@ -129,23 +129,19 @@ const ModelMenu = ({models, aliases, currentAction, open, anchorEl, onClose, sel
 </Menu>
 }
 
-const cookieName = 'model-menu-items'
-
-const useModelList = () => { 
-  const [modelList, setModelList] = React.useState([]);
+const useModelList = () => {  
+  const cookieName = 'model-menu-items' 
   const store = dynamoStorage();
   const getModelList = async() => {
-    const list = await store.getItem(cookieName); 
-    // alert('getModelList'+list) 
+    const list = await store.getItem(cookieName);  
     return JSON.parse(list || '[]');
   }
-  return { 
-    modelList,
+  const setModelList = async(value) => {
+    await store.setItem(cookieName, JSON.stringify(value))  
+  }
+  return {  
     getModelList,
-    setModelList: async (value) => {
-      // alert('setModelList'+JSON.stringify(value))
-      await store.setItem(cookieName, JSON.stringify(value))  
-    } 
+    setModelList 
   }
 }
 
