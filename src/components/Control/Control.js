@@ -4,6 +4,7 @@ import {
   Button,
   DialogActions,
   Dialog,
+  IconButton,
   DialogContent,
   DialogContentText,
   Stack, 
@@ -11,7 +12,9 @@ import {
   TextField,
   Box,
   DialogTitle,
-  styled
+  Typography,
+  styled,
+  InputAdornment
 } from '@mui/material';
 import { Close } from '@mui/icons-material';
 
@@ -42,18 +45,35 @@ const Tab = styled(Box)(({selected}) => ({
   }
 }))
 
-export const Tabs = ({items, value, removeTab, onChange, ...props}) => {
+export const Tabs = ({items, value, removeTab, onChange, readonly, ...props}) => {
   if (!items?.length) {
     return '';
   }
 
-  return <Flex>
+  return <Flex {...props}>
     {items.map((child, o) => <Tooltip key={o} title={child}><Tab selected={o === value}>
       <Box className="child" onClick={e => onChange(false, o)}>{child}</Box>
-      {o > 0 && <Close onClick={() => removeTab(child, o === value)} className="btn"/>}
+      {o > 0 && !readonly && <Close onClick={() => removeTab(child, o === value)} className="btn"/>}
       </Tab></Tooltip>)}
   </Flex>
   
+}
+
+export const Picture = ({src, alt, sx, ...props}) => {
+  const [ok, setOk] = React.useState(false);
+  React.useEffect(() => {
+    const im = new Image();
+    im.onload = () => {
+      console.log ({loaded: src})
+      setOk(true);
+    }
+    console.log ({loading: src})
+    im.src = src;
+  }, [src]);
+  if (!ok) {
+    return <div style={sx}><Typography sx={{m: 1}} variant="caption">{alt}</Typography></div>
+  }
+  return <img src={src} alt={alt} {...props} />
 }
  
 
@@ -63,7 +83,7 @@ export const StyledPagination = ({ totalPages, page, handleChange }) => {
   }
   return (
     <Pagination
-      sx={{p: 1}}
+      sx={{pt: 1}}
       color="primary"
       showFirstButton
       showLastButton
@@ -76,16 +96,26 @@ export const StyledPagination = ({ totalPages, page, handleChange }) => {
   );
 };
 
-export const TextBox = ({onChange, onEnter, ...props}) => {
+export const TextBox = ({onChange, onEnter, allowClear, ...props}) => {
   const [value, setValue] = React.useState(props.value);
   const change = e => {
     setValue(e.target.value);
     onChange && onChange(e.target.value, e);
   }
+  const  InputProps=allowClear && !!value?.length ? {
+    endAdornment: <InputAdornment position="end">
+      <IconButton onClick={() => {
+        change({target: {value: ''}})
+        onEnter('')
+      }}><Close /></IconButton> 
+    </InputAdornment>,
+  } : null;
+
   return (<TextField   
     size="small"
     autoFocus
     {...props} 
+    InputProps={InputProps}
     value={value}
     onKeyUp={(e) => e.keyCode === 13 && onEnter && onEnter(value, e)}
     onChange={change}

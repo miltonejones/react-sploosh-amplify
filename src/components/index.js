@@ -17,7 +17,8 @@ import {
   Tabs ,
   UL,
   LI,
-  TextBox
+  TextBox,
+  Picture
   } from './Control/Control';
 
 export {
@@ -42,5 +43,6 @@ export {
   VideoDrawer,
   useSystemDialog,
   UL,
-  LI
+  LI,
+  Picture
 };

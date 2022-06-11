@@ -139,7 +139,7 @@ export default function VideoCollection(props) {
  
         </Flex>
       </Box>
-      <Box className="App">
+      <Box sx={{mt:1}} className="App">
         <div className="ThumbnailGrid">
           {records?.filter(f => !!f && f.ID).map((video) => (
             <VideoCard
