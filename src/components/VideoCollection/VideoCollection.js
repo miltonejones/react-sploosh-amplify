@@ -23,7 +23,13 @@ import {
   SystemDialog, 
   useSystemDialog 
 } from '../';
-import { TextField, Box, Button, IconButton, Badge } from '@mui/material';
+import { TextField, Box, Button, IconButton, Badge, Snackbar,
+  Stack,
+  Alert,
+  Typography, 
+  LinearProgress,
+  styled
+} from '@mui/material';
 import { Sync, Add, VideoLabel, Close, Edit, CheckBox } from '@mui/icons-material';
 import './VideoCollection.css';
 import VideoDrawer from '../VideoDrawer/VideoDrawer';
@@ -55,18 +61,30 @@ export default function VideoCollection(props) {
     toggleEditMode,
     editMode,
     onHeart,
-    onDrop
+    onDrop,
+    openShoppingCart
   } = useVideoCollection(props);
   const WindowManager = useWindowManager()
   const { count, records } = response;
   const [windowLength, setWindowLength] = React.useState(0)
+  const [snackProps, setSnackProps] = React.useState({value: 0})
   React.useEffect(() => {
     const sub = windowChange.subscribe(on => {
       console.log ({ sub }); 
       setWindowLength(WindowManager.getLength())
     })
 
-    const im =  importComplete.subscribe(() => {
+    const im =  importComplete.subscribe((data) => {
+      if (data) {
+        console.log ({ data })
+        setSnackProps({...data, open: !0});
+        if (data.complete) {
+          setSnackProps({...data, open: !1});
+          return openShoppingCart()
+        }
+        return;
+      }
+      setSnackProps({ open: !1 });
       refreshList()
     });
 
@@ -175,6 +193,7 @@ export default function VideoCollection(props) {
         buttons={fabButtons}
       />
       <VideoDrawer onClose={closeVideoPanel} refreshList={refreshList}  />
+      <ProgressSnackbar {...snackProps} />
     </>
   );
 }
@@ -303,6 +322,10 @@ function useVideoCollection({
     setComponentState('editMode', !editMode)
   }
 
+  const openShoppingCart = () => {
+    setComponentState('videoDrawerOpen', true)
+  }
+
   const load = React.useCallback(
     async (p, t, s) => {
       setState('busy', !0);
@@ -389,6 +412,35 @@ function useVideoCollection({
     toggleEditMode,
     editMode,
     candidateVideos,
-    selectedVideos
+    selectedVideos,
+    openShoppingCart
   };
 }
+
+const ProgressSnackbar = ({progress = 0, statusText, video, image, open}) => { 
+  const photo = video?.image || image;
+  return <Snackbar
+ 
+  anchorOrigin={{ vertical:'top', horizontal:'right' }}
+  open={open}>
+    <Alert severity="info" sx={{minWidth: '40vw', overflow: 'hidden'}}>
+      <Flex>
+        {!!photo && <img src={photo} alt={video?.title} 
+          style={{width: 100, height: 'auto', borderRadius: 4}}/>}
+        <Stack sx={{ ml:1 }}>
+          <Text variant="body2">{statusText}</Text>
+          {!!progress && <LinearProgress variant="determinate" value={progress} />}
+        </Stack>
+      </Flex>
+    </Alert>
+
+  </Snackbar>
+}
+
+const Text = styled(Typography)(() => ({
+  width: 'calc(40vw - 172px)',
+  whiteSpace: 'nowrap',
+  textOverflow: 'ellipsis',
+  overflow: 'hidden',  
+}))
+
