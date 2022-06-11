@@ -6,7 +6,7 @@ import { TextBox, UL, LI } from '../';
 import { getModelsByName } from '../../connector/DbConnector';
  
  
-export default function ModelSelect({ onSelect, onCreate, onMultiple }) {
+export default function ModelSelect({ onSelect, onCreate, onMultiple, ...props }) {
   const theme = useTheme();
   const [anchorEl, setAnchorEl] = React.useState(null); 
   const [open, setOpen] = React.useState(false); 
@@ -67,7 +67,7 @@ export default function ModelSelect({ onSelect, onCreate, onMultiple }) {
 
   return (
     <div>
-      <FormControl sx={{ m: 1, width: 300 }}> 
+      <FormControl sx={{ m: 1, width: 300, ...props.sx }}> 
 
         <TextBox onEnter={(v, e) => getModels(v, e)} onChange={(x, e) => handleClick(e)} 
         placeholder="Find models" 

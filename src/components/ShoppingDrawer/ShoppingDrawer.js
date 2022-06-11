@@ -142,7 +142,7 @@ const pageSize = 24;
 /**
  * ShoppingDrawer 
  */
-export default function ShoppingDrawer ({open, onClose, onClick}) {
+export default function ShoppingDrawer ({open, videoDrawerData, onClose, onClick}) {
   const [state, setState] = React.useState({
     parserList: [],
     showParsers: true,
@@ -190,27 +190,28 @@ export default function ShoppingDrawer ({open, onClose, onClick}) {
   }
 
 
-  const findVideos = async (v, index = 0, out = []) => {
+  const findVideos = async (v, index = 0, out = [], pages, text) => { 
     if (index < selectedParsers.length) {
       const e = selectedParsers[index];
       const p = Math.ceil(((index + 1) / selectedParsers.length) * 100); 
-      const res = await getVideosByText(`http://${e}/`, v);
-      setState({...state, progress: p, statusText: `Searched ${e}...`})
+      const s= `https://${e}/`; 
+      const res = await getVideosByText(s, v); 
+      setState({...state, progress: p,  statusText: `Searched ${e}...`})
       out = out.concat(res.videos);
-      return await findVideos(v, ++index, out)
+      return await findVideos(v, ++index, out, res.pages, s)
     }
-    setState({...state, statusText: '', showParsers: !1, searchResults: out, minWidth: 960}) 
+    setState({...state, statusText: '', showParsers: !1, searchText: text, searchPages: pages, searchResults: out, minWidth: 960}) 
   }
 
   const pageTo = async(uri) => {
     const { searchText } = state;
-    const domain = /(\w+:\/\/[^/]+)/.exec(searchText);
-    // alert (domain[0] + '+' + uri)
-    return await getVideos(domain[0] + uri)
+    const domain = /(\w+:\/\/[^/]+)/.exec(searchText); 
+    alert (domain+'--'+uri)
+    return await getVideos(domain[0] + uri, !0);
   }
 
-  const getVideos = async (v) => {
-    if (httpMode) {
+  const getVideos = async (v, http) => {
+    if (httpMode || http) {
       setState({...state, progress: 1, statusText: `Searching ${v}...`})
       const res = await getVideosByURL(v); 
       setState({
@@ -228,8 +229,7 @@ export default function ShoppingDrawer ({open, onClose, onClick}) {
     if (saveMode) {
       setState({...state, progress: 1, statusText: `Saving ${v}...`})
       const b = await getVideoByURL(v);
-      const c = await saveVideo(b);
-      console.log ({ b, c });
+      const c = await saveVideo(b); 
       importComplete.next();
       setState({...state, progress: 0, statusText: '', saveMode: !1}) 
       return;
@@ -311,7 +311,7 @@ export default function ShoppingDrawer ({open, onClose, onClick}) {
 
       <Box sx={{ p: 1, minWidth, transition: "width 0.2s linear" }}>
       
-      {!!searchPages && <Flex sx={{gap: 1}}>
+      {!!searchPages && !progress && <Flex sx={{gap: 1}}>
         
         <Typography variant="caption">OTHER PAGES FOR THIS SEARCH</Typography>
         
@@ -323,7 +323,7 @@ export default function ShoppingDrawer ({open, onClose, onClick}) {
 
         <Collapse in={!searchResults?.length}>
 
-          <SearchBox 
+          {!videoDrawerData && <SearchBox 
               onChange={v => setState({...state, httpMode: !saveMode && (v.indexOf('http') > -1)})}
               saveMode={saveMode} 
               label={saveMode ? "Add Video" : "Find Videos"} 
@@ -331,7 +331,13 @@ export default function ShoppingDrawer ({open, onClose, onClick}) {
               onEnter={getVideos} 
               disabled={!!progress}
               busy={progress}
-            />
+            />}
+
+          {!!videoDrawerData && <Button 
+              disabled={!!progress}
+              onClick={() => getVideos(videoDrawerData)}
+              variant="contained"
+              >Search for {videoDrawerData}</Button>}
 
         </Collapse>
 

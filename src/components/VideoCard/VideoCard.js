@@ -3,8 +3,7 @@ import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import CardMedia from '@mui/material/CardMedia';
 import Typography from '@mui/material/Typography';
-import { Avatar, Box, IconButton } from '@mui/material';
-import { CardActionArea, Collapse } from '@mui/material';
+import { Avatar, Box, IconButton, CardActionArea, Collapse, styled } from '@mui/material';
 import Tooltip from '@mui/material/Tooltip';
 import { RegionMenu } from '../';
 // import { WindowManagerService } from '../../services/WindowManager';
@@ -13,7 +12,37 @@ import { useWindowManager } from '../../services/WindowManager';
 
 const ERR_IMAGE = 'https://s3.amazonaws.com/sploosh.me.uk/assets/XXX.jpg';
 
-export default function VideoCard({ video, onClick, onSearch, getModel, small, onDrop, onHeart, selected, chosen }) {
+const Heart = styled(Box)(() => ({
+  position: 'absolute',
+  right: 0,
+  top: 0,
+  opacity: 'var(--icon-opacity)'
+}))
+
+const View = styled(Card)(({selected, opacity, chosen}) => ({
+  '--icon-opacity': 0.3,
+  maxWidth: 345, 
+  opacity, 
+  outline: selected || chosen ? '3px dotted #37a' : '',
+  position: 'relative' ,
+  '&:hover': {
+    '--icon-opacity': 1,
+  }
+}))
+
+
+export default function VideoCard({ 
+  video, 
+  onClick, 
+  onSearch, 
+  getModel, 
+  small, 
+  onDrop, 
+  onHeart, 
+  selected, 
+  readonly,
+  chosen 
+}) {
   const [open, setOpen] = React.useState(false);
   const [src, setSrc] = React.useState(ERR_IMAGE);
   const [showModels, setShowModels] = React.useState(false);
@@ -38,12 +67,19 @@ export default function VideoCard({ video, onClick, onSearch, getModel, small, o
     : { width: 220, height: 130 };
   const visited = WindowManager.visited(video);
   const opacity = visited ? 0.5 : 1;
+  const likeButton = <IconButton onClick={() => { 
+    onHeart && onHeart(video.ID);
+    setShowMenu(false);
+    }}>
+    <Favorite style={{ color: video.favorite ? 'red' : 'gray' }} /> 
+  </IconButton>
+
   return (
-    <Card sx={{ 
-      maxWidth: 345, 
-      opacity, 
-      outline: selected || chosen ? '3px dotted #37a' : '',
-      position: 'relative' }} elevation={video.favorite ? 6 : 1}>
+    <View 
+    opacity={opacity}
+    selected={selected}
+    chosen={chosen}  
+    elevation={video.favorite ? 6 : 1}>
       <CardActionArea>
         <Tooltip title={video.title}> 
             <CardMedia
@@ -51,10 +87,19 @@ export default function VideoCard({ video, onClick, onSearch, getModel, small, o
               height={height}
               image={src}
               alt={video.title}
-              onClick={() => setOpen(!open)}
+              onClick={() => {
+                if (readonly) {
+                  return onClick && onClick(video)
+                }
+                setOpen(!open)
+              }}
             />
         </Tooltip>
       </CardActionArea>
+
+      {!!small && <Heart>
+        {likeButton}
+      </Heart>}
 
       <RegionMenu
         {...menuProps}
@@ -68,12 +113,7 @@ export default function VideoCard({ video, onClick, onSearch, getModel, small, o
     <Collapse in={showMenu}>
       
       <Flex style={{padding:12}}>
-        <IconButton onClick={() => {
-          onHeart(video.ID);
-          setShowMenu(false);
-          }}>
-          <Favorite style={{ color: video.favorite ? 'red' : 'gray' }} /> 
-        </IconButton>
+        {likeButton}
         <IconButton onClick={() => {
           onDrop(video.ID, video.title);
           setShowMenu(false);
@@ -165,7 +205,7 @@ export default function VideoCard({ video, onClick, onSearch, getModel, small, o
         </CardContent>
       )}
       
-    </Card>
+    </View>
 
   );
 }

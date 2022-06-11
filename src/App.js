@@ -30,6 +30,7 @@ function VideoGrid (props) {
     locate, 
     searchDrawerOpen,
     videoDrawerOpen,
+    videoDrawerData,
     modelModalState, 
     pageIndex,
     loaded,
@@ -47,10 +48,7 @@ function VideoGrid (props) {
   const Component = pageIndex < 3 ? VideoCollection : ModelGrid;
 
   React.useEffect(() => { 
-    if (loaded) return;
-    getModelsByName('bree').then((res) => {
-       console.log ({ res })
-    }).catch (console.log)
+    if (loaded) return; 
     setState(s =>  ({...s, loaded: 1}))
   }, [loaded])
 
@@ -101,7 +99,11 @@ function VideoGrid (props) {
         <ModelModal {...modelModalState} /> 
 
         <ShoppingDrawer
-          onClose={() => setState('videoDrawerOpen', false)} 
+          videoDrawerData={videoDrawerData}
+          onClose={() => {
+            setState('videoDrawerOpen', false);
+            setState('videoDrawerData', null)
+          }} 
           open={videoDrawerOpen}
         />
 

@@ -185,6 +185,8 @@ export default function VideoDrawer ({refreshList, onClose, onClick}) {
         
 
          <ModelSelect onMultiple={multiModel} onSelect={castModel} onCreate={createModel} />
+
+         
           {!!videoRest.length && !!videoOne.models?.length && <Button onClick={() => castModels()} fullWidth variant="contained"
             >Add {videoOne.models?.length} model{videoOne.models?.length==1?'':'s'} to {selectedVideos.length} videos</Button>}
 

@@ -31,8 +31,13 @@ export const deleteVideo = async (id) => {
   return await response.json();
 };
 
-export const getModel = async (id, page = 1) => {
-  const response = await fetch(API_ENDPOINT + `/model/${id}/${page}`);
+export const getModel = async (id, page = 1, favorite = false, param) => {
+  const suffix = favorite ? '/1' : '';
+  let address = `/model/${id}/${page}${suffix}`
+  if (!!param) {
+   address = `/model-filter/${id}/${page}/${param}`
+  }
+  const response = await fetch(API_ENDPOINT + address);
   return await response.json();
 };
 
@@ -76,6 +81,16 @@ export const getModelsByName = async (name) => {
   return await response.json();
 }
 
+export const getModelCostars = async (id) => {
+  const response = await fetch(API_ENDPOINT + `/model-costars/${id}`);
+  return await response.json();
+}
+
+export const getModelMissingVideos = async (id) => {
+  const response = await fetch(API_ENDPOINT + `/model-missing/${id}`);
+  return await response.json();
+}
+
 
 export const removeModelFromVideo = async (trackFk, modelFk) => {
   const requestOptions = {
@@ -94,8 +109,30 @@ export const addModelToVideo = async (trackFk, modelFk) => {
   };
   const response = await fetch(API_ENDPOINT + '/model/cast', requestOptions);
   return await response.json();
-};
+}; 
 
+
+export const addModelAlias = async (modelFk, aliasFk) => {
+  const requestOptions = {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ modelFk, aliasFk }),
+  };
+  const response = await fetch(API_ENDPOINT + '/add-model-alias', requestOptions);
+  return await response.json();
+}
+
+
+
+export const updateModelPhoto = async ( id, image ) => {
+  const requestOptions = {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ id, image }),
+  };
+  const response = await fetch(API_ENDPOINT + '/add-model-photo', requestOptions);
+  return await response.json();
+}
 
 
 export const addModel = async (name) => {

@@ -31,11 +31,11 @@ export const getVideosByURL = async (uri) => {
   return await response.json();
 };
 
-export const getVideosByText = async (domain, param) => {
+export const getVideosByText = async (domain, param, page) => {
   const requestOptions = {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ domain, param }),
+    body: JSON.stringify({ domain, param, page }),
   };
   const response = await fetch(API_ENDPOINT + '/search/param', requestOptions);
   return await response.json();
