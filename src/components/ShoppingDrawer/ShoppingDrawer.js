@@ -238,6 +238,14 @@ export default function ShoppingDrawer ({open, videoDrawerData, onClose, onClick
     // update progress
     setState({...state, progress: percent, statusText: `Found ${size} videos on '${domain}' page ${num}...`});
 
+    const videoOne = res.videos?.[0] 
+    importComplete.next({
+      progress: percent,
+      statusText: `Found ${size} videos on '${domain}' page ${num}...` ,
+      image: videoOne?.Photo
+    });
+
+
     await wait (2);
 
     if (!!num && !!res?.pages?.length && num < 4) {
@@ -274,8 +282,16 @@ export default function ShoppingDrawer ({open, videoDrawerData, onClose, onClick
         }
       } 
 
+
       // update progress
       setState({...state, progress: p,  statusText: `Found ${out.length} videos on ${e}...`});
+      
+      const videoOne = res.videos?.[0] 
+      importComplete.next({
+        progress: p,
+        statusText: `Found ${out.length} videos on ${e}...` ,
+        image: videoOne?.Photo
+      });
 
       return await findVideos(v, {
         ...options,
@@ -285,6 +301,11 @@ export default function ShoppingDrawer ({open, videoDrawerData, onClose, onClick
         text: s
       } );
     }
+
+    importComplete.next({
+      progress: 100, 
+      complete: true 
+    });
 
     setState({
       ...state, 
@@ -347,6 +368,11 @@ export default function ShoppingDrawer ({open, videoDrawerData, onClose, onClick
       const current = selectedVideos[index];
       const b = await getVideoByURL(current);
       const c = await saveVideo(b); 
+      importComplete.next({
+        progress: p,
+        statusText: `Saved ${b.title || current}...`,
+        video: b
+      });
       setState({...state, current, progress: p, minWidth: 320, statusText: `Saved ${current}...` })
       return await uploadEvery(++index)
     } 
