@@ -69,6 +69,7 @@ function VideoGrid (props) {
          <Tabs onChange={handleChange} 
             removeTab={removeTab} 
             value={tabValue} 
+            sx={{mt: 0.5}}
             items={["All Videos"].concat(searches?.map(s => s.param))}
             />
 

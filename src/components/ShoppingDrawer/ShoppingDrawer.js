@@ -22,7 +22,8 @@ import {
   UL,
   LI,
   Flex,
-  TextBox
+  TextBox,
+  Picture
 } from '../';
 import { Close, Sync, Add, Search, CheckBox, Check, Save } from '@mui/icons-material';
 import { getParsers } from '../../connector/ParserConnector';
@@ -383,6 +384,9 @@ export default function ShoppingDrawer ({open, videoDrawerData, onClose, onClick
 
   const preview = !state.current ? null : searchResults.find(f => f.URL === state.current)
 
+  const icon = !!progress
+    ? <Sync className="spin" />
+    : <Search/>
 
   return <>
     <Drawer  
@@ -427,10 +431,11 @@ export default function ShoppingDrawer ({open, videoDrawerData, onClose, onClick
             />}
 
           {!!videoDrawerData && <Button 
+              fullWidth
               disabled={!!progress}
               onClick={() => getVideos(videoDrawerData)}
               variant="contained"
-              >Search for {videoDrawerData}</Button>}
+              >Search for {videoDrawerData} {icon}</Button>}
 
         </Collapse>
 
@@ -488,7 +493,7 @@ const Thumb = ({res, ...props}) => {
   return <Tooltip title={res.Text}><Frame  
     {...props}
     sx={{padding: '0 10px', maxWidth: 140, opacity: res.existing ? 0.3 : 1}}>
-    <img key={res.Text} src={res.Photo} alt={res.Text} />
+    <Picture key={res.Text} src={res.Photo} alt={res.Text} />
     <Text variant="body2">{res.Text}</Text> 
     <Flex spaced>
       <Text variant="caption">{res.domain}</Text>

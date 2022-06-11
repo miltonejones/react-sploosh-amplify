@@ -30,8 +30,9 @@ const Tab = styled(Box)(({selected}) => ({
   display: 'flex',
   alignItems: 'center',
   cursor: 'pointer',
-  padding: '12px 16px 4px 16px',
-  borderBottom: selected ? 'solid 2px #37a' : 'solid 2px white',
+  padding: '8px 16px 4px 16px',
+  borderBottom: selected ? 'solid 3px #37a' : 'solid 3px #eaeaea',
+  backgroundColor: selected ? '#eaeaea' : '#fff',
   '& .child': { 
     color: selected ? '#37a' : '#222',
     maxWidth: 180,
@@ -53,8 +54,12 @@ export const Tabs = ({items, value, removeTab, onChange, readonly, ...props}) =>
   return <Flex {...props}>
     {items.map((child, o) => <Tooltip key={o} title={child}><Tab selected={o === value}>
       <Box className="child" onClick={e => onChange(false, o)}>{child}</Box>
-      {o > 0 && !readonly && <Close onClick={() => removeTab(child, o === value)} className="btn"/>}
+      {!readonly && <Close 
+        sx={{color: o > 0 ? '#000' : '#ccc'}}
+        onClick={() => removeTab(child, o === value)} className="btn"
+        />}
       </Tab></Tooltip>)}
+      <Tab sx={{flexGrow: 1, color: '#fff'}}>M{!readonly && <Close sx={{color: '#fff'}} />}</Tab>
   </Flex>
   
 }
