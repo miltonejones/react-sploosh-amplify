@@ -319,13 +319,15 @@ export default function ModelModal(props) {
     case 2:
       textProps = {
         placeholder: 'Enter video URL',
-        label: 'Add video'
+        label: 'Add video',
+        sx: {maxWidth: 240}
       }
       break;
     case 3:
       textProps = {
         placeholder: 'Enter image URL',
-        label: 'Set model photo'
+        label: 'Set model photo',
+        sx: {maxWidth: 240}
       }
       break;
     default:

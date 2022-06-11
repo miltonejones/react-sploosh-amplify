@@ -16,14 +16,15 @@ import {
 import { styled, Drawer } from '@mui/material';
 import   { SplooshContext }  from '../../hooks/useSploosh';
 
-import { Add, Delete, MenuBook } from '@mui/icons-material';
+import { Add, Delete, MenuBook, Launch } from '@mui/icons-material';
 
 import { 
   SystemDialog, 
   useSystemDialog ,
   UL,
   LI,
-  Flex
+  Flex,
+  Spacer
 } from '../';
 import ModelSelect from '../ModelSelect/ModelSelect';
 import { addModelToVideo } from '../../connector/DbConnector';
@@ -115,10 +116,15 @@ export default function VideoDrawer ({refreshList, onClose, onClick}) {
         open={drawerOpen}
         onClose={onClose}
         >
-          <Flex spaced sx={{pl: 1}}>
+          <Flex sx={{pl: 1}}>
             <Box>
             Edit Video
             </Box> 
+            <Spacer />
+            <IconButton href={videoOne.URL} target="_blank">
+              <Launch  /> 
+            </IconButton>
+
            {!!videoOne.Key && <IconButton    
               href={`https://www.javlibrary.com/en/vl_searchbyid.php?keyword=${videoOne.Key}`} target="_blank"
               ><MenuBook /></IconButton>}

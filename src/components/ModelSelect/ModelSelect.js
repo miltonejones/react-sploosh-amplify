@@ -37,6 +37,9 @@ export default function ModelSelect({ onSelect, onCreate, onMultiple, ...props }
   }
 
   const collateNames = name => ((out) => {
+    if (out.indexOf (' ') < -1) {
+      return out;
+    }
     const parts = name.split(' ');
     parts.map((part, o) => {
       if (o % 2 !== 0) return;
