@@ -139,6 +139,11 @@ const SearchBox = ({onChange, onEnter, saveMode, ...props}) => {
 
 const pageSize = 24;
 
+const wait = secs => new Promise(yes => {
+  console.log ('waiting %ss', secs);
+  setTimeout(yes, secs * 999);
+})
+
 /**
  * ShoppingDrawer 
  */
@@ -189,18 +194,81 @@ export default function ShoppingDrawer ({open, videoDrawerData, onClose, onClick
     return await findVideos(v)
   }
 
+  const pageVideos = async (domain, pages, percent, pageNum = 1, out = []) => {
+    const currentPage = pages.find(p => p[1] > pageNum);
+    if (!currentPage) {
+      return out;
+    }
+    
+    const [path, num] = currentPage;
+    const address = `${domain}${path}`;
+    // alert (JSON.stringify(address) + ' --> ' + num);
+    const res = await getVideosByURL(address); 
+    // alert (JSON.stringify(res?.videos))
+    !!res.videos && (out = out.concat(res.videos));
 
-  const findVideos = async (v, index = 0, out = [], pages, text) => { 
+    const size = res?.videos?.length ?? 0;
+
+    // update progress
+    setState({...state, progress: percent, statusText: `Found ${size} videos on '${domain}' page ${num}...`});
+
+    await wait (2);
+
+    if (!!num && !!res?.pages?.length && num < 4) {
+      const nextPage = res.pages.find(p => p[1] > num);
+      // alert (JSON.stringify(nextPage))
+      return pageVideos(domain, res.pages, percent, num, out);
+    }
+    
+    return out;
+  }
+
+  const findVideos = async (v, options = {}) => { 
+    let { index = 0, out = [], pageNum = 1, pages, text } = options;
     if (index < selectedParsers.length) {
       const e = selectedParsers[index];
       const p = Math.ceil(((index + 1) / selectedParsers.length) * 100); 
-      const s= `https://${e}/`; 
+
+      console.log({ pageNum, pages });
+      
+      // build base URL from parser domain
+      const s = `https://${e}/`; 
+
       const res = await getVideosByText(s, v); 
-      setState({...state, progress: p,  statusText: `Searched ${e}...`})
+
+      // append videos to collection
       out = out.concat(res.videos);
-      return await findVideos(v, ++index, out, res.pages, s)
+
+      await wait (2);
+
+      if (res?.pages?.length) {
+        const more = await pageVideos(`https://${e}`, res.pages, p);
+        if (more?.length) {
+          out = out.concat(more)
+        }
+      } 
+
+      // update progress
+      setState({...state, progress: p,  statusText: `Found ${out.length} videos on ${e}...`});
+
+      return await findVideos(v, {
+        ...options,
+        pages: res.pages,
+        index: ++index,
+        out,
+        text: s
+      } );
     }
-    setState({...state, statusText: '', showParsers: !1, searchText: text, searchPages: pages, searchResults: out, minWidth: 960}) 
+
+    setState({
+      ...state, 
+      statusText: '', 
+      showParsers: !1, 
+      searchText: text, 
+      searchPages: pages, 
+      searchResults: out, 
+      minWidth: 960
+    }) 
   }
 
   const pageTo = async(uri) => {
