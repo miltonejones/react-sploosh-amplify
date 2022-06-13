@@ -68,15 +68,13 @@ export const Picture = ({src, alt, sx, ...props}) => {
   const [ok, setOk] = React.useState(false);
   React.useEffect(() => {
     const im = new Image();
-    im.onload = () => {
-      console.log ({loaded: src})
+    im.onload = () => { 
       setOk(true);
-    }
-    console.log ({loading: src})
+    } 
     im.src = src;
   }, [src]);
   if (!ok) {
-    return <div style={sx}><Typography sx={{m: 1}} variant="caption">{alt}</Typography></div>
+    return <div style={{...sx, overflow: 'hidden'}}><Typography sx={{m: 1}} variant="caption">{alt}</Typography></div>
   }
   return <img src={src} alt={alt} {...props} />
 }

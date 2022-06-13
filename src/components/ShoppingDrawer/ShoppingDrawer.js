@@ -22,10 +22,11 @@ import {
   UL,
   LI,
   Flex,
+  Spacer,
   TextBox,
   Picture
 } from '../';
-import { Close, Sync, Add, Search, CheckBox, Check, Save } from '@mui/icons-material';
+import { Close, Sync, Add, Search, CheckBox, Check, Save, ExpandMore, ExpandLess } from '@mui/icons-material';
 import { getParsers } from '../../connector/ParserConnector';
 import { getVideosBySite } from '../../connector/ParserConnector';
 import { getVideosByText } from '../../connector/ParserConnector';
@@ -44,9 +45,9 @@ const textBoxProps = {
 }
 
 const PageNum = styled(Avatar)(({ selected }) => ({
-  width: 32, 
-  height: 32, 
-  marginLeft: 4, 
+  width: 24, 
+  height: 24, 
+  marginLeft: 2, 
   fontSize: '.8rem', 
   bgcolor: selected ? 'orange' : '',
   cursor: 'pointer'
@@ -129,6 +130,7 @@ const SearchBox = ({onChange, onEnter, saveMode, ...props}) => {
   const args = {
     ...props,
     ...textBoxProps,
+    autoFocus: true,
     onChange: change,
     onKeyUp: ({ keyCode }) => keyCode === 13 && onEnter(value),
     InputProps,
@@ -163,6 +165,17 @@ const useParserList = () => {
   }
 }
 
+const dressAddress = (domain) => p => {
+  const address = p[0].indexOf('://') > 0 
+    ? p[0]
+    : `https://${domain}${p[0]}`
+  return [
+    address,
+    p[1],
+    domain
+  ]
+}
+
 
 /**
  * ShoppingDrawer 
@@ -190,8 +203,10 @@ export default function ShoppingDrawer ({open, videoDrawerData, onClose, onClick
     minWidth ,
     progress,
     selectedVideos,
-    statusText,
-    searchPages
+    statusText, 
+    sessionList = [],
+    searchPages = [],
+    searchLabel
 } = state;
   const {  
     getParserList,
@@ -216,7 +231,12 @@ export default function ShoppingDrawer ({open, videoDrawerData, onClose, onClick
  
 
   const loopVideos = async (v) => { 
-    setState({...state, minWidth: 320, progress:1, statusText: `Finding videos like '${v}'...` })
+    setState({
+        ...state, 
+        minWidth: 320, 
+        progress:1, 
+        statusText: `Finding videos like '${v}'...`  
+      })
     return await findVideos(v)
   }
 
@@ -225,9 +245,10 @@ export default function ShoppingDrawer ({open, videoDrawerData, onClose, onClick
     if (!currentPage) {
       return out;
     }
+
+    let addresses;
     
-    const [path, num] = currentPage;
-    const address = `${domain}${path}`;
+    const [address, num] = currentPage; 
     // alert (JSON.stringify(address) + ' --> ' + num);
     const res = await getVideosByURL(address); 
     // alert (JSON.stringify(res?.videos))
@@ -236,39 +257,40 @@ export default function ShoppingDrawer ({open, videoDrawerData, onClose, onClick
     const size = res?.videos?.length ?? 0;
 
     // update progress
-    setState({...state, progress: percent, statusText: `Found ${size} videos on '${domain}' page ${num}...`});
+    setState({...state, progress: percent, statusText: `Found ${size} videos on '${address}...`});
 
     const videoOne = res.videos?.[0] 
     importComplete.next({
       progress: percent,
-      statusText: `Found ${size} videos on '${domain}' page ${num}...` ,
+      statusText: `Found ${size} videos on '${address}...` ,
       image: videoOne?.Photo
     });
 
 
     await wait (2);
 
-    if (!!num && !!res?.pages?.length && num < 4) {
-      const nextPage = res.pages.find(p => p[1] > num);
-      // alert (JSON.stringify(nextPage))
-      return pageVideos(domain, res.pages, percent, num, out);
+    if (!!num && !!res?.pages?.length && num < 4) { 
+      addresses = res.pages.map(dressAddress(domain)); 
+      return pageVideos(domain, addresses, percent, num, out);
     }
     
     return out;
   }
 
   const findVideos = async (v, options = {}) => { 
+    
     let { index = 0, out = [], pageNum = 1, pages, text } = options;
+    let addresses;
+
     if (index < selectedParsers.length) {
       const e = selectedParsers[index];
       const p = Math.ceil(((index + 1) / selectedParsers.length) * 100); 
-
-      console.log({ pageNum, pages });
+ 
       
       // build base URL from parser domain
-      const s = `https://${e}/`; 
+      const domain = `https://${e}`; 
 
-      const res = await getVideosByText(s, v); 
+      const res = await getVideosByText(domain + '/', v); 
 
       // append videos to collection
       out = out.concat(res.videos);
@@ -276,7 +298,8 @@ export default function ShoppingDrawer ({open, videoDrawerData, onClose, onClick
       await wait (2);
 
       if (res?.pages?.length) {
-        const more = await pageVideos(`https://${e}`, res.pages, p);
+        addresses = res.pages.map(dressAddress(e));
+        const more = await pageVideos(e, addresses, p);
         if (more?.length) {
           out = out.concat(more)
         }
@@ -295,10 +318,10 @@ export default function ShoppingDrawer ({open, videoDrawerData, onClose, onClick
 
       return await findVideos(v, {
         ...options,
-        pages: res.pages,
+        pages: addresses,
         index: ++index,
         out,
-        text: s
+        text: domain
       } );
     }
 
@@ -307,38 +330,70 @@ export default function ShoppingDrawer ({open, videoDrawerData, onClose, onClick
       complete: true 
     });
 
+    const from = selectedParsers.length > 1 
+      ? `${selectedParsers.length} sites`
+      : selectedParsers[0]
+
+    // console.log ({ pages, searchPages })
+
+    const results = {
+      searchLabel: `Videos like '${v}' from ${from}`, 
+      searchPages: searchPages
+      .filter(f => !!f && !pages?.some(e => !!e && e[0] === f[0] && e[2] === f[2]))  
+      .concat(pages), 
+      searchResults: out, 
+    };
+
+    const list = sessionList.concat(results)
+
     setState({
       ...state, 
-      statusText: '', 
+      ...results,
+      sessionList: list, 
+      statusText: '',   
       showParsers: !1, 
-      searchText: text, 
-      searchPages: pages, 
-      searchResults: out, 
+      showSessionList: !1,
+      searchText: text,  
       minWidth: 960
     }) 
   }
 
   const pageTo = async(uri) => {
     const { searchText } = state;
-    const domain = /(\w+:\/\/[^/]+)/.exec(searchText); 
-    alert (domain+'--'+uri)
-    return await getVideos(domain[0] + uri, !0);
+    const domain = /(\w+:\/\/[^/]+)/.exec(searchText);   
+    return await getVideos(uri, !0);
   }
 
   const getVideos = async (v, http) => {
     if (httpMode || http) {
-      setState({...state, progress: 1, statusText: `Searching ${v}...`})
+      const domain = /\w+:\/\/([^/]+)/.exec(v);  
+      setState({...state, progress: 1, statusText: `Searching ${v}...`})  
       const res = await getVideosByURL(v); 
+      const addresses = !domain ? [] : res.pages?.map(dressAddress(domain[1])); 
+
+      console.log ({ addresses, searchPages})
+      const results = {
+        searchLabel: `Videos from URL '${v}'`, 
+        searchPages: searchPages
+        .filter(f => !!f && !addresses?.some(e => !!e && e[0] === f[0] && e[2] === f[2]))  
+        .concat(addresses), 
+        searchResults: res.videos, 
+      };
+  
+      const list = sessionList.concat(results) 
+
       setState({
-        ...state, 
+        ...state,
+        ...results, 
+        sessionList: list,
         progress: 0, 
         statusText: '', 
         searchText: v,
         searchPage: 1,
-        showParsers: !1, 
-        searchPages: res.pages, 
-        searchResults: res.videos, 
-        minWidth: 960}) 
+        showParsers: !1,  
+        showSessionList: !1,
+        minWidth: 960
+      }) 
       return;
     }
     if (saveMode) {
@@ -397,6 +452,7 @@ export default function ShoppingDrawer ({open, videoDrawerData, onClose, onClick
   const resetState = () => setState({
     ...state, 
     showParsers: !0, 
+    showSessionList: !1,
     selectedVideos: [],
     searchResults: [], 
     added: [], 
@@ -404,7 +460,8 @@ export default function ShoppingDrawer ({open, videoDrawerData, onClose, onClick
     minWidth: 320,
     searchPage: 1,
     statusText: '',
-    searchPages: null,
+    searchPages: [],
+    searchLabel: null,
     progress: 0,
   });
 
@@ -421,6 +478,7 @@ export default function ShoppingDrawer ({open, videoDrawerData, onClose, onClick
       onClose={onClose}
       >
 
+    {/* drawer header */}
       <Flex spaced sx={{pl: 1}}>
         <Box>
           Shop for Videos
@@ -431,19 +489,59 @@ export default function ShoppingDrawer ({open, videoDrawerData, onClose, onClick
            
       <Divider />
 
+    {/* list of previous searches */}
+     {!!sessionList.length && !progress && <> 
+        <Flex>
+          <Stack>
+            {!searchResults.length &&  <Badge color="primary" badgeContent={sessionList.length}><Typography sx={{m: 1}} variant="caption">PREVIOUS SEARCHES</Typography></Badge>}
+            {sessionList 
+            .map((sessionItem, i) =>  
+              <ResultTitle on={sessionItem.searchLabel === searchLabel || state.showSessionList}>
+                <Typography 
+                  key={i} 
+                  variant="caption" 
+                  sx={{ 
+                    p: 1, 
+                    mb: 2, 
+                    cursor: 'pointer', 
+                    fontWeight: sessionItem.searchLabel === searchLabel ? 600 : 400 
+                  }} 
+                  onClick={() => setState({
+                    ...state, 
+                    ...sessionItem, 
+                    showParsers: !1, 
+                    searchPage: 1,  
+                    minWidth: 960
+                  })}
+                >{sessionItem.searchLabel}</Typography>
+              </ResultTitle>
+            )}
+          </Stack>
+          <Spacer />
+         <IconButton onClick={() => setState({...state, showSessionList: !state.showSessionList})}>
+          {!!state.showSessionList ?  <ExpandLess /> : <ExpandMore />}
+          </IconButton>
+        </Flex>
+        <Divider /> 
+      </>
+      }
+        
+
 
       <Box sx={{ p: 1, minWidth, transition: "width 0.2s linear" }}>
       
-      {!!searchPages && !progress && <Flex sx={{gap: 1}}>
-        
+      {/* search pages */}
+      {!!searchPages.length && !progress && <Flex sx={{gap: 1}}>
+      
+
+     
         <Typography variant="caption">OTHER PAGES FOR THIS SEARCH</Typography>
         
-        {searchPages.map(page => <PageNum
+        {searchPages.filter(d=>!!d).map(page => <PageNum
             onClick={() => pageTo(page[0])}
             key={page[1]}>{page[1]}</PageNum>)}</Flex>}
  
- 
-
+      {/* search textbox or button */}
         <Collapse in={!searchResults?.length}>
 
           {!videoDrawerData && <SearchBox 
@@ -465,18 +563,22 @@ export default function ShoppingDrawer ({open, videoDrawerData, onClose, onClick
 
         </Collapse>
 
+      {/* status text */}
         <Status minWidth={minWidth}><Text error variant="caption">{statusText}</Text></Status>
        
       {/* [{progress}] */}
-      
       {!!progress && <LinearProgress sx={{mb: 1}} variant="determinate" value={progress} />}
+      
+      {/* save thumbnail preview */}
       {!!preview && <Thumb res={preview} />}
 
+      {/* list of parsers */}
         <Collapse sx={{mt: 2}} in={showParsers && !saveMode && !httpMode}>
           <Typography variant="caption" sx={{mb: 1}}>CHOOSE SITES TO SEARCH</Typography>
           <ParserList {...state} selectParser={selectParser}/>
         </Collapse>
-       
+
+      {/* search result pagination */}
         <Collapse in={!state.current && !!searchResults?.length}>
          
           <Flex spaced>
@@ -500,6 +602,7 @@ export default function ShoppingDrawer ({open, videoDrawerData, onClose, onClick
           </Flex>
         </Collapse>
 
+      {/* search results */}
        {!state.current &&  <Excel sx={{m: 1}}>
           {searchResults?.map && shown?.filter(f => !!f).map(res => <Thumb  
             res={res}
@@ -511,15 +614,21 @@ export default function ShoppingDrawer ({open, videoDrawerData, onClose, onClick
 
     </Drawer>
   </>
-
-
 }
 
+
+const ResultTitle = styled(Box)(({ on }) => ({
+  height: on ? 24 : 0,
+  marginTop: on ? 4 : 0,
+  overflow: 'hidden',
+  transition: 'height 0.2s linear'
+}));
+
 const Thumb = ({res, ...props}) => {
-  return <Tooltip title={res.Text}><Frame  
+  return <Tooltip onClick={props.onClick} title={res.Text}><Frame  
     {...props}
     sx={{padding: '0 10px', maxWidth: 140, opacity: res.existing ? 0.3 : 1}}>
-    <Picture key={res.Text} src={res.Photo} alt={res.Text} />
+    <Picture key={res.Text} src={res.Photo} alt={res.Text} sx={{width: 140, height: 80}} />
     <Text variant="body2">{res.Text}</Text> 
     <Flex spaced>
       <Text variant="caption">{res.domain}</Text>
