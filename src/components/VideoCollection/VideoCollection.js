@@ -62,6 +62,7 @@ export default function VideoCollection(props) {
     editMode,
     onHeart,
     onDrop,
+    openSearchPanel,
     videoDrawerOpen,
     openShoppingCart
   } = useVideoCollection(props);
@@ -165,6 +166,7 @@ export default function VideoCollection(props) {
               key={video.ID}
               video={video}
               onClick={selectVideo}
+              onShop={openSearchPanel}
               selected={!!selectedVideos?.length && selectedVideos.some(f => !!f && f.ID === video.ID)}
               chosen={!!candidateVideos?.length && candidateVideos.some(f => !!f && f.ID === video.ID)}
               getModel={(q) => {
@@ -384,6 +386,11 @@ function useVideoCollection({
     setComponentState('selectedVideos', []);
   }
 
+  const openSearchPanel = (param) => {
+    setComponentState('videoDrawerOpen', true);
+    setComponentState('videoDrawerData', param);
+  }
+
   const openVideoPanel = () => { 
     setComponentState('selectedVideos', candidateVideos)
   }
@@ -399,6 +406,7 @@ function useVideoCollection({
     pageNum,
     handleChange,
     modelModalState,
+    openSearchPanel,
     showDialog,
     busy,
     setBusy,

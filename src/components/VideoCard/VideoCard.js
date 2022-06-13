@@ -7,7 +7,7 @@ import { Avatar, Box, IconButton, CardActionArea, Collapse, styled } from '@mui/
 import Tooltip from '@mui/material/Tooltip';
 import { RegionMenu } from '../';
 // import { WindowManagerService } from '../../services/WindowManager';
-import { Favorite, DeleteForever, Launch, MoreVert, MenuBook } from '@mui/icons-material';
+import { Favorite, DeleteForever, Launch, MoreVert, Search, MenuBook } from '@mui/icons-material';
 import { useWindowManager } from '../../services/WindowManager';
 
 const ERR_IMAGE = 'https://s3.amazonaws.com/sploosh.me.uk/assets/XXX.jpg';
@@ -41,6 +41,7 @@ export default function VideoCard({
   onHeart, 
   selected, 
   readonly,
+  onShop,
   chosen 
 }) {
   const [open, setOpen] = React.useState(false);
@@ -123,11 +124,19 @@ export default function VideoCard({
         <IconButton onClick={() => setShowMenu(false)} href={video.URL} target="_blank">
           <Launch  /> 
         </IconButton>
-       {!!video.Key && <IconButton  
+       {!!video.Key && <>
+        <IconButton onClick={() => {
+          onShop(video.Key)
+          setShowMenu(false);
+          }} >
+          <Search  /> 
+        </IconButton>
+        <IconButton  
        onClick={() => setShowMenu(false)}
         href={`https://www.javlibrary.com/en/vl_searchbyid.php?keyword=${video.Key}`} target="_blank">
           <MenuBook  /> 
-        </IconButton>}
+        </IconButton>
+       </>}
       </Flex>
 
       </Collapse>
