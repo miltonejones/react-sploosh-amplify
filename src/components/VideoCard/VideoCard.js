@@ -30,6 +30,18 @@ const View = styled(Card)(({selected, opacity, chosen}) => ({
   }
 }))
 
+const CardMenu = styled(Box)(({ on }) => ({
+  position: 'absolute',
+  top: on ? 0 : -70,
+  transition: 'top 0.2s linear',
+  left: 0,
+  width: '100%',
+  outline: 'dotted 1px yellow',
+  color: 'white',
+  backgroundColor: 'rgba(255, 255, 255, 0.7)',
+  zIndex: 3
+}))
+
 
 export default function VideoCard({ 
   video, 
@@ -77,6 +89,8 @@ export default function VideoCard({
 
   return (
     <View 
+    onMouseEnter={() => setShowMenu(true)}
+    onMouseLeave={() => setShowMenu(false)}
     opacity={opacity}
     selected={selected}
     chosen={chosen}  
@@ -98,7 +112,7 @@ export default function VideoCard({
         </Tooltip>
       </CardActionArea>
 
-      {!!small && <Heart>
+      {!!small && !showMenu && <Heart>
         {likeButton}
       </Heart>}
 
@@ -111,9 +125,9 @@ export default function VideoCard({
         open={open}
       />
 
-    <Collapse in={showMenu}>
+    <CardMenu on={showMenu && !open}>
       
-      <Flex style={{padding:12}}>
+      <Flex sx={{justifyContent: 'center'}}>
         {likeButton}
         <IconButton onClick={() => {
           onDrop(video.ID, video.title);
@@ -124,22 +138,26 @@ export default function VideoCard({
         <IconButton onClick={() => setShowMenu(false)} href={video.URL} target="_blank">
           <Launch  /> 
         </IconButton>
-       {!!video.Key && <>
+
+       {!!video.Key && !small && <>
         <IconButton onClick={() => {
           onShop(video.Key)
           setShowMenu(false);
           }} >
           <Search  /> 
         </IconButton>
+
         <IconButton  
-       onClick={() => setShowMenu(false)}
-        href={`https://www.javlibrary.com/en/vl_searchbyid.php?keyword=${video.Key}`} target="_blank">
+          onClick={() => setShowMenu(false)}
+          href={`https://www.javlibrary.com/en/vl_searchbyid.php?keyword=${video.Key}`} target="_blank">
           <MenuBook  /> 
         </IconButton>
        </>}
       </Flex>
 
-      </Collapse>
+      </CardMenu>
+
+
       {!small && (
         <CardContent>
           <Flex sx={{ width: '100%' }}>
@@ -207,9 +225,7 @@ export default function VideoCard({
             </Typography>
             <Spacer />
             <u className="action" onClick={() => onSearch(`${video.studio}-`)}>{video.studio}</u>
-            <IconButton onClick={() => setShowMenu(!showMenu)}>
-              <MoreVert />
-            </IconButton>
+       
           </Flex>
         </CardContent>
       )}
