@@ -38,13 +38,13 @@ class WindowManagerService$ {
       });
   }
   async launch(video, index = 0) {
+    await VideoPersistService.add(video);
     this.launched.push({
       video,
       index,
       window: this.region(video, index),
     });
     this.index++;
-    await VideoPersistService.add(video);
     setTimeout(() => this.focus(), 99);
   }
   visited(video) {

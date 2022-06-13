@@ -31,8 +31,9 @@ const Tab = styled(Box)(({selected}) => ({
   alignItems: 'center',
   cursor: 'pointer',
   padding: '8px 16px 4px 16px',
+  borderRadius: '0 4px 0 0',
   borderBottom: selected ? 'solid 3px #37a' : 'solid 3px #eaeaea',
-  backgroundColor: selected ? '#eaeaea' : '#fff',
+  backgroundColor: selected ? '#dadada' : '#fff',
   '& .child': { 
     color: selected ? '#37a' : '#222',
     maxWidth: 180,

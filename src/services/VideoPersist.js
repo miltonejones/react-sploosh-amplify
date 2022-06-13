@@ -18,12 +18,12 @@ class VideoPersistService$ {
     }
   }
 
-  async add(track) {
+  async add(track) { 
     const existing = await this.get();
     const setting = existing.filter((old) => old !== track.ID);
-    setting.push(track.ID);
+    setting.unshift(track.ID);
     await this.set(setting);
-    console.warn(`Added ${track.title} to cache:`);
+    console.log (`Added ${track.title} to cache:`);
     console.log(`${JSON.stringify(setting).length} bytes.`);
   }
 
@@ -61,7 +61,7 @@ class VideoPersistService$ {
   async get() {
     const storage = await this.getSetting(RECENT_WATCHED_SETTING_NAME)
     try {
-      return JSON.parse(storage || []).reverse();
+      return JSON.parse(storage || []);
     } catch (e) { return []; }
   }
 
