@@ -29,7 +29,7 @@ export default function RegionMenu({ width, height, open, click }) {
   return (
     <div
       className={className}
-      style={{ height, width, border: 'solid 1px red' }}
+      style={{ height, width, border: 'solid 1px red', zIndex: 4 }}
     >
       {areas.map((area, i) => (
         <div key={i} onClick={() => click(i)} style={area.css}></div>
