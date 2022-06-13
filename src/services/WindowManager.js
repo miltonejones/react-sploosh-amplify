@@ -37,14 +37,14 @@ class WindowManagerService$ {
         app.window && app.window.focus()
       });
   }
-  launch(video, index = 0) {
+  async launch(video, index = 0) {
     this.launched.push({
       video,
       index,
       window: this.region(video, index),
     });
     this.index++;
-     VideoPersistService.add(video);
+    await VideoPersistService.add(video);
     setTimeout(() => this.focus(), 99);
   }
   visited(video) {
@@ -90,8 +90,8 @@ const windowChange = new Observer();
 function useWindowManager () { 
 
 
-  const launch = (video, i) => {
-    WindowManagerService.launch(video, i);  
+  const launch = async (video, i) => {
+    await WindowManagerService.launch(video, i);  
     windowChange.next(true);
   }
   

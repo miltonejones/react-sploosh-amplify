@@ -280,7 +280,7 @@ function useVideoCollection({
   const recentVideos = React.useCallback(
     async (p) => {
       const searchKey$ =  `recent-${p}`;
-        const allTracks = VideoPersistService.get()
+        const allTracks = await VideoPersistService.get()
         const first = (p - 1) * 30;
         const Keys = allTracks.slice(first, first + 30)
         if (!Keys.length) return alert(['NO KEYS IN', allTracks.length])

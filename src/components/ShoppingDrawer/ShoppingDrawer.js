@@ -466,7 +466,7 @@ export default function ShoppingDrawer ({open, videoDrawerData, onClose, onClick
     progress: 0,
   });
 
-  const preview = !state.current ? null : searchResults.find(f => f.URL === state.current)
+  const preview = !state.current ? null : searchResults.find(f => f.URL === state.current);
 
   const icon = !!progress
     ? <Sync className="spin" />
@@ -484,8 +484,8 @@ export default function ShoppingDrawer ({open, videoDrawerData, onClose, onClick
         <Box>
           Shop for Videos
         </Box> 
-         <IconButton  onClick={() => setState({...state, saveMode: !saveMode})}   
-          ><Add /></IconButton> 
+        <IconButton onClick={() => setState({...state, saveMode: !saveMode})}   
+        ><Add /></IconButton> 
       </Flex>
            
       <Divider />
