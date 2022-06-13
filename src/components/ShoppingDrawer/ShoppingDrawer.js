@@ -131,6 +131,7 @@ const SearchBox = ({onChange, onEnter, saveMode, ...props}) => {
     ...props,
     ...textBoxProps,
     autoFocus: true,
+    fullWidth: true,
     onChange: change,
     onKeyUp: ({ keyCode }) => keyCode === 13 && onEnter(value),
     InputProps,
@@ -237,7 +238,17 @@ export default function ShoppingDrawer ({open, videoDrawerData, onClose, onClick
         progress:1, 
         statusText: `Finding videos like '${v}'...`  
       })
-    return await findVideos(v)
+    const results = await findVideos(v);
+    const list = sessionList.concat(results)
+    setState({
+      ...state, 
+      ...results,
+      sessionList: list, 
+      statusText: '',   
+      showParsers: !1, 
+      showSessionList: !1, 
+      minWidth: 960
+    }) 
   }
 
   const pageVideos = async (domain, pages, percent, pageNum = 1, out = []) => {
@@ -344,18 +355,8 @@ export default function ShoppingDrawer ({open, videoDrawerData, onClose, onClick
       searchResults: out, 
     };
 
-    const list = sessionList.concat(results)
+    return results;
 
-    setState({
-      ...state, 
-      ...results,
-      sessionList: list, 
-      statusText: '',   
-      showParsers: !1, 
-      showSessionList: !1,
-      searchText: text,  
-      minWidth: 960
-    }) 
   }
 
   const pageTo = async(uri) => {
