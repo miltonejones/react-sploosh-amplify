@@ -62,6 +62,7 @@ export default function VideoCollection(props) {
     editMode,
     onHeart,
     onDrop,
+    videoDrawerOpen,
     openShoppingCart
   } = useVideoCollection(props);
   const WindowManager = useWindowManager()
@@ -77,7 +78,7 @@ export default function VideoCollection(props) {
     const im =  importComplete.subscribe((data) => {
       if (data) {
         console.log ({ data })
-        setSnackProps({...data, open: !0});
+        setSnackProps({...data, open: !videoDrawerOpen});
         if (data.complete) {
           setSnackProps({...data, open: !1});
           return openShoppingCart()
@@ -222,6 +223,7 @@ function useVideoCollection({
     selectedVideos, 
     selectVideo, 
     editMode,
+    videoDrawerOpen,
     setState: setComponentState
 } = React.useContext(SplooshContext);
  
@@ -413,6 +415,7 @@ function useVideoCollection({
     editMode,
     candidateVideos,
     selectedVideos,
+    videoDrawerOpen,
     openShoppingCart
   };
 }
@@ -420,25 +423,30 @@ function useVideoCollection({
 const ProgressSnackbar = ({progress = 0, statusText, video, image, open}) => { 
   const photo = video?.image || image;
   return <Snackbar
- 
-  anchorOrigin={{ vertical:'top', horizontal:'right' }}
+  anchorOrigin={{ vertical:'bottom', horizontal:'left' }}
   open={open}>
-    <Alert severity="info" sx={{minWidth: '40vw', overflow: 'hidden'}}>
-      <Flex>
+    <Block severity="info" sx={{minWidth: '30vw', overflow: 'hidden'}}>
+      <Flex style={{'--block-offset': !!photo ? '72px' : '172px'}}>
         {!!photo && <img src={photo} alt={video?.title} 
           style={{width: 100, height: 'auto', borderRadius: 4}}/>}
         <Stack sx={{ ml:1 }}>
-          <Text variant="body2">{statusText}</Text>
+          <Text variant="caption">{statusText}</Text>
           {!!progress && <LinearProgress variant="determinate" value={progress} />}
         </Stack>
       </Flex>
-    </Alert>
+    </Block>
 
   </Snackbar>
 }
 
+const Block = styled(Box)(() => ({
+  backgroundColor: '#dadaff',
+  padding: 8  ,
+  borderRadius: 4
+}))
+
 const Text = styled(Typography)(() => ({
-  width: 'calc(40vw - 172px)',
+  width: 'calc(30vw - var(--block-offset))',
   whiteSpace: 'nowrap',
   textOverflow: 'ellipsis',
   overflow: 'hidden',  
