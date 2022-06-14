@@ -625,12 +625,15 @@ const ResultTitle = styled(Box)(({ on }) => ({
   transition: 'height 0.2s linear'
 }));
 
-const Thumb = ({res, ...props}) => {
-  return <Tooltip onClick={props.onClick} title={res.Text}><Frame  
-    {...props}
+const Thumb = ({res, onClick, ...props}) => {
+  return <Tooltip title={res.Text}><Frame {...props} 
     sx={{padding: '0 10px', maxWidth: 140, opacity: res.existing ? 0.3 : 1}}>
-    <Picture key={res.Text} src={res.Photo} alt={res.Text} sx={{width: 140, height: 80}} />
-    <Text variant="body2">{res.Text}</Text> 
+    <Picture onClick={onClick} {...props} 
+     key={res.Text} src={res.Photo} alt={res.Text} 
+     sx={{width: 140, height: 80}} />
+    <Text onClick={() => {
+      window.open(res.URL)
+    }} variant="body2">{res.Text}</Text> 
     <Flex spaced>
       <Text variant="caption">{res.domain}</Text>
       <Text variant="caption">{res.Time}</Text> 

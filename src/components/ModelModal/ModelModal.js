@@ -320,20 +320,21 @@ export default function ModelModal(props) {
       textProps = {
         placeholder: 'Enter video URL',
         label: 'Add video',
-        sx: {maxWidth: 240}
+        sx: {ml: 3, maxWidth: 240}
       }
       break;
     case 3:
       textProps = {
         placeholder: 'Enter image URL',
         label: 'Set model photo',
-        sx: {maxWidth: 240}
+        sx: {ml: 3, maxWidth: 240}
       }
       break;
     default:
       textProps = {
         placeholder: 'Filter videos',
-        label: 'Search'
+        label: 'Search',
+        sx: {ml: 3, maxWidth: 240}
       }
   }
 
@@ -389,16 +390,9 @@ export default function ModelModal(props) {
           </IconButton>}
           
           <Box sx={{flexGrow: 1}} />
-          <IconButton target="_blank" href={`https://www.google.com/search?q=${model.name}%20xxx&source=lnms&tbm=isch`}>
-            <MenuBook />
-          </IconButton>
-          <IconButton onClick={() => {
-            setSplooshState('videoDrawerOpen', true);
-            setSplooshState('videoDrawerData', model.name);
-            handleClose();
-          }}>
-            <Shop />
-          </IconButton>
+
+ 
+
           <IconButton onClick={handleClick}>
             <MoreVert />
           </IconButton>
@@ -427,7 +421,27 @@ export default function ModelModal(props) {
         value={tabValue} readonly 
         items={['Videos', 'Costars', 'Favorites'].concat(state.missingModel?.length ? 'Missing' : [])} 
         />
-      <StyledPagination {...paginationProps}  />
+
+        <Flex sx={{pr: 2}}>
+          <StyledPagination {...paginationProps}  />
+       
+          <Box sx={{flexGrow: 1}} />
+
+
+         {tabValue === 0 && <> 
+         <IconButton target="_blank" href={`https://www.google.com/search?q=${model.name}%20xxx&source=lnms&tbm=isch`}>
+            <MenuBook />
+          </IconButton>
+
+          <IconButton onClick={() => {
+            setSplooshState('videoDrawerOpen', true);
+            setSplooshState('videoDrawerData', model.name);
+            handleClose();
+          }}>
+            <Shop />
+          </IconButton>
+          </>}
+        </Flex>
      
       {tabValue === 1 && !!shownCostars.length && <StarGrid>
         {shownCostars.map(costar => <StarBox><Picture 
