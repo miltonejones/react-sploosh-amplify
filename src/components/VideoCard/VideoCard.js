@@ -89,13 +89,14 @@ export default function VideoCard({
 
   return (
     <View 
+    onMouseLeave={() => setShowMenu(false)}
     opacity={opacity}
     selected={selected}
     chosen={chosen}  
     elevation={video.favorite ? 6 : 1}>
       <CardActionArea
-    onMouseEnter={() => setShowMenu(true)}
-    onMouseLeave={() => setShowMenu(false)}>
+        onMouseEnter={() => setShowMenu(true)}
+        onMouseLeave={() => setShowMenu(false)}>
         <Tooltip title={video.title}> 
             <CardMedia
               component="img"
@@ -125,7 +126,8 @@ export default function VideoCard({
         open={open}
       />
 
-    <CardMenu on={showMenu && !open}>
+    <CardMenu on={showMenu && !open} 
+      onMouseEnter={() => setShowMenu(true)}>
       
       <Flex sx={{justifyContent: 'center'}}>
         {likeButton}

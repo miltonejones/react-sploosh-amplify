@@ -65,7 +65,7 @@ export const Tabs = ({items, value, removeTab, onChange, readonly, ...props}) =>
   
 }
 
-export const Picture = ({src, alt, sx, ...props}) => {
+export const Picture = ({src, alt, sx, onClick, ...props}) => {
   const [ok, setOk] = React.useState(false);
   React.useEffect(() => {
     const im = new Image();
@@ -77,7 +77,8 @@ export const Picture = ({src, alt, sx, ...props}) => {
   if (!ok) {
     return <div style={{...sx, overflow: 'hidden'}}><Typography sx={{m: 1}} variant="caption">{alt}</Typography></div>
   }
-  return <img src={src} alt={alt} {...props} />
+  return <Box onClick={() => onClick && onClick()}
+    ><img {...props} style={sx} src={src} alt={alt} /></Box>
 }
  
 
