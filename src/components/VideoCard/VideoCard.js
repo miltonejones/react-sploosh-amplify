@@ -89,13 +89,13 @@ export default function VideoCard({
 
   return (
     <View 
-    onMouseEnter={() => setShowMenu(true)}
-    onMouseLeave={() => setShowMenu(false)}
     opacity={opacity}
     selected={selected}
     chosen={chosen}  
     elevation={video.favorite ? 6 : 1}>
-      <CardActionArea>
+      <CardActionArea
+    onMouseEnter={() => setShowMenu(true)}
+    onMouseLeave={() => setShowMenu(false)}>
         <Tooltip title={video.title}> 
             <CardMedia
               component="img"
@@ -197,7 +197,7 @@ export default function VideoCard({
             )}
             {!video.models.length && (
               <b className="red action">
-                <u >
+                <u onClick={() => onClick && onClick(video)}>
                   Add model...
                 </u> 
               </b> 
