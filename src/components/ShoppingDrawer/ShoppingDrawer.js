@@ -494,7 +494,7 @@ export default function ShoppingDrawer ({open, videoDrawerData, onClose, onClick
      {!!sessionList.length && !progress && <> 
         <Flex>
           <Stack>
-            {!searchResults.length &&  <Badge color="primary" badgeContent={sessionList.length}><Typography sx={{m: 1}} variant="caption">PREVIOUS SEARCHES</Typography></Badge>}
+            {!searchResults?.length &&  <Badge color="primary" badgeContent={sessionList.length}><Typography sx={{m: 1}} variant="caption">PREVIOUS SEARCHES</Typography></Badge>}
             {sessionList 
             .map((sessionItem, i) =>  
               <ResultTitle on={sessionItem.searchLabel === searchLabel || state.showSessionList}>
