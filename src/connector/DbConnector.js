@@ -135,6 +135,17 @@ export const updateModelPhoto = async ( id, image ) => {
 }
 
 
+export const getModelsByTitle = async (title) => {
+  const requestOptions = {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" } ,
+    body: JSON.stringify({ title }),
+  };
+  const response = await fetch(API_ENDPOINT + `/model-title`, requestOptions);
+  return await response.json();
+};
+
+
 export const addModel = async (name) => {
   const requestOptions = {
     method: "PUT",
