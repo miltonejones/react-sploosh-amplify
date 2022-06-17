@@ -35,11 +35,19 @@ const CardMenu = styled(Box)(({ on }) => ({
   top: on ? 0 : -70,
   transition: 'top 0.2s linear',
   left: 0,
-  width: '100%',
-  outline: 'dotted 1px yellow',
+  width: '100%', 
   color: 'white',
-  backgroundColor: 'rgba(255, 255, 255, 0.7)',
+  backgroundColor: 'rgba(255, 255, 255, 0.5)',
   zIndex: 3
+}))
+
+
+const Tip = styled(Tooltip)(() => ({ 
+  '& .MuiTooltip-tooltip': {
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    border: 'solid 1px red !important',
+    borderRadius: 0,
+  }
 }))
 
 
@@ -97,7 +105,7 @@ export default function VideoCard({
       <CardActionArea
         onMouseEnter={() => setShowMenu(true)}
         onMouseLeave={() => setShowMenu(false)}>
-        <Tooltip title={video.title}> 
+        <Tip title={video.title}> 
             <CardMedia
               component="img"
               height={height}
@@ -110,7 +118,7 @@ export default function VideoCard({
                 setOpen(!open)
               }}
             />
-        </Tooltip>
+        </Tip>
       </CardActionArea>
 
       {!!small && !showMenu && <Heart>
@@ -240,9 +248,9 @@ export default function VideoCard({
 const ModelName = ({Name, image}) => {
   if (!image) return Name;
   return (
-    <Tooltip title={<img className="model-image" src={image} alt={Name} />}>
+    <Tip title={<img className="model-image" src={image} alt={Name} />}>
       <span>{Name}</span>
-    </Tooltip>)
+    </Tip>)
 }
 
 export const Flex = ({ children, ...props }) => (
@@ -259,9 +267,7 @@ export const Spacer = () => <Box sx={{ flexGrow: 1 }} />;
 export const Shorten = ({ children, limit = 40 }) => {
   const text = children.toString();
   if (text.length <= limit) return text;
-  return (
-    <Tooltip title={text}>
-      <span className="action">{text.substr(0, limit) + '...'}</span>
-    </Tooltip>
+  return ( 
+      <span className="action">{text.substr(0, limit) + '...'}</span> 
   );
 };
