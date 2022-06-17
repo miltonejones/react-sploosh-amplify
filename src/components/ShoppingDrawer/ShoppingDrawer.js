@@ -239,7 +239,9 @@ export default function ShoppingDrawer ({open, videoDrawerData, onClose, onClick
         statusText: `Finding videos like '${v}'...`  
       })
     const results = await findVideos(v);
-    const list = sessionList.concat(results)
+    const list = sessionList
+                  .filter(s => s.searchLabel !== results?.searchLabel)
+                  .concat(results);
     setState({
       ...state, 
       ...results,

@@ -338,6 +338,9 @@ export default function ModelModal(props) {
       }
   }
 
+  const missingLabel = !!state.missingModel?.length ? "Missing" : [];
+  const missingTab = !state.missingModel ? "Checking..." : missingLabel;
+
   return (
     <Dialog
       classes={{ paper: 'model-modal' }}
@@ -419,7 +422,7 @@ export default function ModelModal(props) {
         sx={{ml: 1}}
         onChange={handleTabs} 
         value={tabValue} readonly 
-        items={['Videos', 'Costars', 'Favorites'].concat(state.missingModel?.length ? 'Missing' : [])} 
+        items={['Videos', 'Costars', 'Favorites'].concat(missingTab)} 
         />
 
         <Flex sx={{pr: 2}}>

@@ -114,7 +114,7 @@ export default function VideoDrawer ({refreshList, onClose, onClick}) {
     } 
     refreshList && refreshList()
   }
-
+  const SLICE_SIZE = 5;
 
   const dropModel = async (id) => {
     const cast = await removeModelFromVideo(videoOne.ID, id);
@@ -169,9 +169,9 @@ export default function VideoDrawer ({refreshList, onClose, onClick}) {
           <Flex>
 
            
-              {videoRest.slice(0, 3).map(av => <Avatar sx={{mr:1}} variant="rounded" src={av.image} alt={av.title} key={av.ID} />)}
+              {videoRest.slice(0, SLICE_SIZE).map(av => <Avatar sx={{mr:1}} variant="rounded" src={av.image} alt={av.title} key={av.ID} />)}
 
-              {videoRest.length > 3 && <small>+ {selectedVideos.length - 3} more</small>}
+              {videoRest.length > SLICE_SIZE && <small>+ {selectedVideos.length - SLICE_SIZE} more</small>}
            
           </Flex>
             <Line />
