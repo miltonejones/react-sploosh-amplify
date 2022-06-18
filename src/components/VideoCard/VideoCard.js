@@ -7,7 +7,7 @@ import { Avatar, Box, IconButton, CardActionArea, Collapse, styled } from '@mui/
 import Tooltip from '@mui/material/Tooltip';
 import { RegionMenu } from '../';
 // import { WindowManagerService } from '../../services/WindowManager';
-import { Favorite, DeleteForever, Launch, MoreVert, Search, MenuBook } from '@mui/icons-material';
+import { Favorite, DeleteForever, Launch, Edit, MoreVert, Search, MenuBook } from '@mui/icons-material';
 import { useWindowManager } from '../../services/WindowManager';
 
 const ERR_IMAGE = 'https://s3.amazonaws.com/sploosh.me.uk/assets/XXX.jpg';
@@ -264,10 +264,33 @@ export const Flex = ({ children, ...props }) => (
 
 export const Spacer = () => <Box sx={{ flexGrow: 1 }} />;
 
+// 
+const Hover = styled(Box)(({ on }) => ({
+  cursor: 'pointer',
+  position: 'relative',
+  outline: on ? 'solid 2px rgba(51, 119, 187, 0.3)' : '',
+  outlineOffset: 4
+}))
+
+const Editor = styled(IconButton)(() => ({
+  top: 0,
+  right: 0,
+  position: 'absolute'
+}))
+
 export const Shorten = ({ children, limit = 40 }) => {
+  const [hover, setHover] = React.useState(false)
   const text = children.toString();
-  if (text.length <= limit) return text;
+  const edit = !hover 
+    ? <i/>
+    : <Editor><Edit /></Editor>
+  if (hover || text.length <= limit) return <Hover on={hover}
+              onMouseEnter={() => setHover(true)}
+              onMouseLeave={() => setHover(false)}
+              >{text}{edit}</Hover>;
   return ( 
-      <span className="action">{text.substr(0, limit) + '...'}</span> 
+      <Box
+      onMouseEnter={() => setHover(true)}
+      className="action">{text.substr(0, limit) + '...'}</Box> 
   );
 };
