@@ -65,20 +65,38 @@ export const Tabs = ({items, value, removeTab, onChange, readonly, ...props}) =>
   
 }
 
+const downloadImage = src => new Promise((yes, no) => {
+  fetch(src)
+  .then(response => response.blob())
+  .then(blob => yes(URL.createObjectURL(blob)))
+  .catch(e => console.log ({ e }, no()));
+})
+
+const getImage = (src) => new Promise((yes, no) => {
+  const im = new Image();
+  im.onload = () => { 
+    yes(src);
+  } 
+  im.onerror = () => { 
+    downloadImage(src)
+      .then(yes)
+      .catch(no); 
+  } 
+  im.src = src;
+})
+
 export const Picture = ({src, alt, sx, onClick, ...props}) => {
   const [ok, setOk] = React.useState(false);
   React.useEffect(() => {
-    const im = new Image();
-    im.onload = () => { 
-      setOk(true);
-    } 
-    im.src = src;
+    getImage(src)
+      .then((source) => setOk(source))
+      .catch(() => setOk(false)); 
   }, [src]);
   if (!ok) {
     return <div style={{...sx, overflow: 'hidden'}}><Typography sx={{m: 1}} variant="caption">{alt}</Typography></div>
   }
   return <Box onClick={() => onClick && onClick()}
-    ><img {...props} style={sx} src={src} alt={alt} /></Box>
+    ><img {...props} style={sx} src={ok} alt={ok} /></Box>
 }
  
 
