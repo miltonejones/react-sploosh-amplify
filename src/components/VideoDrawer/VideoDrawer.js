@@ -32,6 +32,7 @@ import { removeModelFromVideo } from '../../connector/DbConnector';
 import { addModel } from '../../connector/DbConnector';
 import { deleteVideo } from '../../connector/DbConnector';
 import { getModelsByTitle } from '../../connector/DbConnector';
+import { findVideos } from '../../connector/DbConnector';
 
 const Line = styled(Divider)({
   margin: '8px 0'
@@ -40,24 +41,40 @@ const Line = styled(Divider)({
 
 export default function VideoDrawer ({refreshList, onClose, onClick}) {
   const { systemDialogState, Prompt, Confirm } = useSystemDialog();
-  const [foundModels, setFoundModels] = React.useState([])
+  const [foundModels, setFoundModels] = React.useState(null)
   const {
     selectedVideos
   } = React.useContext(SplooshContext); 
 
-  React.useEffect(() => {
-    if (!selectedVideos.length) return;
-    (async() => {
-      const firstVid = selectedVideos[0];
-      const found = await getModelsByTitle(firstVid.title);  
-      setFoundModels(found?.filter(f => {
-        return !firstVid.models.length || !firstVid.models.some(m => m.ID === f.ID);
-      }));
-    })();
-  }, [selectedVideos])
+  const handleClose = () => {
+    setFoundModels(null);
+    onClose()
+  }
 
   const drawerOpen = !!selectedVideos?.length;
-  if (!selectedVideos.length) return <i/>
+  React.useEffect(() => {
+
+    const modelFilter = models => f => !models.length || !models.some(m => m.ID === f.ID);
+
+    (async() => {
+      if (!drawerOpen) return;
+      const firstVid = selectedVideos[0];
+      const found = await getModelsByTitle(firstVid.title);  
+      const filtered = found?.filter(modelFilter(firstVid.models));
+      !firstVid.Key || !!filtered.length && setFoundModels(filtered);
+      if (!firstVid.Key) return setFoundModels([])
+      const otherVideos = await findVideos(firstVid.Key);
+      const matchingVideos = otherVideos.records.filter(f => 
+          f.Key === firstVid.Key && 
+          f.ID !== firstVid.ID && 
+          !!f.models?.length
+          );  
+      if (!matchingVideos.length) return setFoundModels([])
+      setFoundModels(matchingVideos[0].models.filter(modelFilter(firstVid.models))) 
+    })();
+  }, [selectedVideos, drawerOpen])
+
+  if (!drawerOpen) return <i/>
 
   const imageVideo = selectedVideos.find(f => !!f.models?.length)
   const videoOne = imageVideo || selectedVideos[0];
@@ -89,6 +106,7 @@ export default function VideoDrawer ({refreshList, onClose, onClick}) {
       const cast = await castModel(model.ID);
       return await castModels(modelItems, ++index);
     } 
+    setFoundModels([])
   }
 
 
@@ -126,7 +144,7 @@ export default function VideoDrawer ({refreshList, onClose, onClick}) {
         classes={{ root: 'maxWidth', paper: 'maxWidth' }}
         anchor="left"
         open={drawerOpen}
-        onClose={onClose}
+        onClose={handleClose}
         >
           <Flex sx={{pl: 1}}>
             <Box>
@@ -189,6 +207,8 @@ export default function VideoDrawer ({refreshList, onClose, onClick}) {
 
 
          <ModelSelect onMultiple={multiModel} onSelect={castModel} onCreate={createModel} />
+
+         {!foundModels && <i>checking other sources...</i>}
 
          {!!foundModels?.length && <>
           <Typography variant="caption" sx={{mb: 1}}>ALSO STARRING</Typography>
