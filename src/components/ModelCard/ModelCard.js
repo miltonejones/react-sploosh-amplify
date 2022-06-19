@@ -9,7 +9,7 @@ import Typography from '@mui/material/Typography';
 
 const ERR_IMAGE = 'https://s3.amazonaws.com/sploosh.me.uk/assets/no-img-women.jpg';
 
-export default function ModelCard({ ID, image, name, VideoCount, onClick }) {
+export default function ModelCard({ ID, image, name, VideoCount,FaveCount,  onClick }) {
     const [src, setSrc] = React.useState(null);
     const loadVideo = React.useCallback(() => {
         if (!image) {
@@ -40,7 +40,7 @@ export default function ModelCard({ ID, image, name, VideoCount, onClick }) {
       />
       <CardContent>
         <Typography gutterBottom variant="subtitle1" component="div">
-          {name} [{VideoCount}]
+          {name} [{VideoCount}][{FaveCount}]
         </Typography> 
       </CardContent> 
     </Card>

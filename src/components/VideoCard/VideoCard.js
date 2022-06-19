@@ -231,7 +231,7 @@ export default function VideoCard({
 
           <Flex>
             <Typography variant="body2" color="text.secondary">
-              {video.domain}
+              <u className="action" onClick={() => onSearch(`${video.domain}`, 'domain')}>{video.domain}</u>
             </Typography>
             <Spacer />
             <u className="action" onClick={() => onSearch(`${video.studio}-`)}>{video.studio}</u>

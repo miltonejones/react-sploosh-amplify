@@ -26,17 +26,18 @@ export const Flex = styled(Box)(({align = 'center', spaced, fullWidth}) => ({
   justifyContent: spaced ? 'space-between' : ''
 }))
 
-const Tab = styled(Box)(({selected}) => ({
+const Tab = styled(Typography)(({selected}) => ({
   display: 'flex',
   alignItems: 'center',
   cursor: 'pointer',
   padding: '8px 16px 4px 16px',
   borderRadius: '0 4px 0 0',
+  fontWeight: selected ? 600 : 400,
   borderBottom: selected ? 'solid 3px #37a' : 'solid 3px #eaeaea',
   backgroundColor: selected ? '#dadada' : '#fff',
   '& .child': { 
     color: selected ? '#37a' : '#222',
-    maxWidth: 180,
+    maxWidth: selected ? 180 : 120,
     overflow: 'hidden',
     whiteSpace: 'nowrap',
     textOverflow: 'ellipsis',
@@ -53,14 +54,16 @@ export const Tabs = ({items, value, removeTab, onChange, readonly, ...props}) =>
   }
 
   return <Flex {...props}>
-    {items.map((child, o) => <Tooltip key={o} title={child}><Tab selected={o === value}>
+    {items.map((child, o) => <Tooltip key={o} title={child}><Tab 
+      variant={o === value ? "body2" : "caption"}
+      selected={o === value}>
       <Box className="child" onClick={e => onChange(false, o)}>{child}</Box>
-      {!readonly && <Close 
-        sx={{color: o > 0 ? '#000' : '#ccc'}}
+      {!0 && <Close 
+        sx={{color: o > 0 ? (readonly ? '#fff' : '#000') : '#ccc'}}
         onClick={() => removeTab(child, o === value)} className="btn"
         />}
       </Tab></Tooltip>)}
-      <Tab sx={{flexGrow: 1, color: '#fff'}}>M{!readonly && <Close sx={{color: '#fff'}} />}</Tab>
+      <Tab sx={{flexGrow: 1, color: '#fff'}}>M<Close sx={{color: '#fff'}} /></Tab>
   </Flex>
   
 }
@@ -82,6 +85,11 @@ const getImage = (src) => new Promise((yes, no) => {
       .then(yes)
       .catch(no); 
   } 
+  if (src.indexOf('http') < 0) {
+    return downloadImage('https:'+src)
+      .then(yes)
+      .catch(no); 
+  }
   im.src = src;
 })
 

@@ -25,6 +25,7 @@ import { updateModelPhoto } from '../../connector/DbConnector';
 import ModelSelect from '../ModelSelect/ModelSelect';
 import { addModelAlias } from '../../connector/DbConnector';
 import { SplooshContext } from '../../hooks/useSploosh';
+import { quickSearch } from '../ShoppingDrawer/ShoppingDrawer';
 
 
 
@@ -439,6 +440,7 @@ export default function ModelModal(props) {
           <IconButton onClick={() => {
             setSplooshState('videoDrawerOpen', true);
             setSplooshState('videoDrawerData', model.name);
+            setTimeout(() => quickSearch.next(), 999)
             handleClose();
           }}>
             <Shop />
