@@ -37,6 +37,7 @@ import Observer from '../../services/Observer';
 import dynamoStorage from '../../services/DynamoStorage';
 
 export const importComplete = new Observer();
+export const quickSearch = new Observer();
 
 const textBoxProps = {
   autoComplete: "off", 
@@ -227,8 +228,14 @@ export default function ShoppingDrawer ({open, videoDrawerData, onClose, onClick
       const p = await getParsers();
       const c = await getParserList();
       setState({...state, selectedParsers: c, parserList: p.filter(f => !!f.pageParser)})
-    })()
-  }, [parserList])
+    })();
+
+    const sub = quickSearch.subscribe(() => { 
+      !!videoDrawerData && getVideos(videoDrawerData)
+    })
+
+    return () => sub.unsubscribe();
+  }, [parserList, videoDrawerData])
  
 
   const loopVideos = async (v) => { 
@@ -439,10 +446,14 @@ export default function ShoppingDrawer ({open, videoDrawerData, onClose, onClick
   }
 
   const selectEvery = () => {
-    const updated = selectedVideos.length 
-      ? []
-      : shown.map(f => f.URL);
-    setState({...state, selectedVideos: updated.filter(f => !f.existing)})
+    const videosOnPage = shown
+      .filter(f => !f.existing)
+      .map(f => f.URL);
+
+    const updated = selectedVideos
+      .filter(f => !videosOnPage.some(e => e === f))
+      .concat(videosOnPage);
+    setState({...state, selectedVideos: updated})
   }
 
   const selectOne = async (v) => { 
@@ -459,6 +470,7 @@ export default function ShoppingDrawer ({open, videoDrawerData, onClose, onClick
     selectedVideos: [],
     searchResults: [], 
     added: [], 
+    httpMode: false,
     current: null, 
     minWidth: 320,
     searchPage: 1,

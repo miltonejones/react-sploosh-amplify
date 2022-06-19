@@ -61,18 +61,18 @@ export default function useSploosh ({ queryType, pageIndex }) {
       !!selectedTab && navigate(`/video/1`) ;
     };
   
-    const locate = (p) => {
+    const locate = (p, type = 'search') => {
       const raw = p.replace('*', '');
       const tabs = searches.find (t => t.param === raw)
         ? searches 
         : searches.concat({
-          type: 'search',
+          type,
           param: raw
         })
       setState('param', p)
       setState('searches', tabs)
       store.setItem('search-tabs', JSON.stringify(tabs));
-      navigate(`/search/${p}/1`) 
+      navigate(`/${type}/${p}/1`) 
     };
   
     const search = () => {

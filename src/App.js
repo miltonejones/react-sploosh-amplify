@@ -28,6 +28,7 @@ function VideoGrid (props) {
     queryParam,
     searches,
     locate, 
+    collectionType,
     searchDrawerOpen,
     videoDrawerOpen,
     videoDrawerData,
@@ -42,7 +43,7 @@ function VideoGrid (props) {
   const handleChange = (event, newValue) => {
     if (newValue === 0) navigate(`/video/1`)   
     const s = searches[newValue - 1];
-    navigate(`/search/${s.param}/1`)  
+    navigate(`/${s.type}/${s.param}/1`)  
   };
 
   const Component = pageIndex < 3 ? VideoCollection : ModelGrid;
@@ -66,12 +67,15 @@ function VideoGrid (props) {
         {/* search tabs */}
         <Collapse className="head" in={!!searches.length}>
          <Flex spaced fullWidth>
-         <Tabs onChange={handleChange} 
+
+          
+          {collectionType === 'video' &&  <Tabs onChange={handleChange} 
             removeTab={removeTab} 
             value={tabValue} 
             sx={{mt: 0.5}}
             items={["All Videos"].concat(searches?.map(s => s.param))}
-            />
+            />}
+        
 
             {!!queryParam && <>
               <Save onClick={async () => {
@@ -128,6 +132,7 @@ export default function App() {
       <Route path="/heart/:videoPageNum" element={<VideoGrid pageIndex={1} queryType="heart" />} />
       <Route path="/video/:videoPageNum" element={<VideoGrid pageIndex={0} />} />
       <Route path="/search/:queryParam/:videoPageNum" element={<VideoGrid pageIndex={0} />} />
+      <Route path="/domain/:queryParam/:videoPageNum" element={<VideoGrid pageIndex={0} queryType="domain"/>} />
     </Routes>
 </BrowserRouter>
 }

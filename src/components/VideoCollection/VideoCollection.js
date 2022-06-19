@@ -34,6 +34,8 @@ import { Sync, Add, VideoLabel, Close, Edit, CheckBox } from '@mui/icons-materia
 import './VideoCollection.css';
 import VideoDrawer from '../VideoDrawer/VideoDrawer';
 import { importComplete } from '../ShoppingDrawer/ShoppingDrawer';
+import { quickSearch } from '../ShoppingDrawer/ShoppingDrawer';
+import { getVideosByDomain } from '../../connector/DbConnector';
 
 
 
@@ -296,11 +298,14 @@ function useVideoCollection({
         refreshSelectedVideos(items);
     }
   )
+ 
 
   const searchVideos = React.useCallback(
-    async (str, p) => {
-      const items = await findVideos(str, p);
-      const searchKey$ =  `search-${str}-${p}`;
+    async (str, p, d) => {
+      const method = !!d ? getVideosByDomain : findVideos;
+      const items = await method(str, p);
+      const key = !d ? 'search' : 'domain';
+      const searchKey$ =  `${key}-${str}-${p}`;
       console.log({ items });
       setState('response', { ...items , searchKey: searchKey$});
       setState('page', p);
@@ -333,11 +338,15 @@ function useVideoCollection({
   const load = React.useCallback(
     async (p, t, s) => {
       setState('busy', !0);
-      setBusy(!0);
+      setBusy(!0); 
       switch (collectionType) {
         case 'search':
           console.log ('searching for ', s, searchParam, p)
           await searchVideos(s || searchParam, p);
+          break;
+        case 'domain':
+          console.log ('searching for ', s, searchParam, p)
+          await searchVideos(s || searchParam, p, !0);
           break;
         case 'heart':
           await loadFavorites(p);
@@ -389,6 +398,7 @@ function useVideoCollection({
   const openSearchPanel = (param) => {
     setComponentState('videoDrawerOpen', true);
     setComponentState('videoDrawerData', param);
+    setTimeout(() => quickSearch.next(), 999)
   }
 
   const openVideoPanel = () => { 

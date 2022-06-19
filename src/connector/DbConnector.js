@@ -7,6 +7,11 @@ export const getVideos = async (page) => {
   return await response.json();
 };
 
+export const getVideosByDomain = async (domain, page) => {
+  const response = await fetch(API_ENDPOINT + `/domain/${domain}/${page}`);
+  return await response.json();
+};
+
 export const getModels = async (page) => {
   const response = await fetch(API_ENDPOINT + `/models/${page}`);
   return await response.json();
