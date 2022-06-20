@@ -8,13 +8,11 @@ class SearchPersistService$ {
     searchParam = '';
     savedParams = '';
     cookieName = 'saved-video-app-searches-db';
-    store = dynamoStorage()
-    // onChange);
-    // onDrop); 
+    store = dynamoStorage();
   
     async exists(value) {
-      const searches = await this.getSavedSearches();
-      return searches.filter((f) => f === value).length;
+      const savedSearches = await this.getSavedSearches();
+      return savedSearches.filter((f) => f === value).length;
     }
   
     async getSavedSearches() {
@@ -31,24 +29,24 @@ class SearchPersistService$ {
     }
   
     async dropSearch(value) {
-      const searches = await this.getSavedSearches(); 
-      await this.save(searches.filter((f) => f !== value)); 
+      const savedSearches = await this.getSavedSearches(); 
+      await this.save(savedSearches.filter((f) => f !== value)); 
     }
   
     async updateSearch(oldvalue, newvalue) {
-      const searches = await this.getSavedSearches(); 
-      await this.save(searches.filter((f) => f !== oldvalue).concat(newvalue));
+      const savedSearches = await this.getSavedSearches(); 
+      await this.save(savedSearches.filter((f) => f !== oldvalue).concat(newvalue));
     }
   
     async pinSearch(value) {
-      const searches = await this.getSavedSearches();
+      const savedSearches = await this.getSavedSearches();
       const newvalue = value.indexOf('^') > 0 ? value.replace('^', '') : `${value}^`;
-      await this.save(searches.filter((f) => f !== value).concat(newvalue));
+      await this.save(savedSearches.filter((f) => f !== value).concat(newvalue));
     }
   
     async editSearch(updated, value) {
-      const searches = await this.getSavedSearches();
-      const existed = searches.filter((f) => f !== value); 
+      const savedSearches = await this.getSavedSearches();
+      const existed = savedSearches.filter((f) => f !== value); 
       existed.push(updated);
       this.save(existed); 
     }

@@ -47,7 +47,7 @@ const LI = styled('li')(({header}) => ({
 
 
 export default function SearchDrawer ({open, onClose, onClick}) {
-    const [searches, setSearches] = React.useState(null)
+    const [drawerSearches, setSearches] = React.useState(null)
     const { systemDialogState, Prompt, Confirm } = useSystemDialog();
 
     const pinSearch = async (value) => {
@@ -72,16 +72,16 @@ export default function SearchDrawer ({open, onClose, onClick}) {
     }
 
     React.useEffect(() => {
-        !searches && (async()=>{
+        !drawerSearches && (async()=>{
           const existing = await SearchPersistService.getSavedSearches();
           setSearches(existing)
         })()
-    }, [searches])
+    }, [drawerSearches])
 
-    console.log ({searches})
+    console.log ({drawerSearches})
 
-    const pinned = searches?.filter (f => f && f.indexOf('^') > 0).map(f => f.replace('^', ''));
-    const unpinned = searches?.filter (f => f && f.indexOf('^') < 0);
+    const pinned = drawerSearches?.filter (f => f && f.indexOf('^') > 0).map(f => f.replace('^', ''));
+    const unpinned = drawerSearches?.filter (f => f && f.indexOf('^') < 0);
 
     return <>
     <Drawer
@@ -146,7 +146,7 @@ export default function SearchDrawer ({open, onClose, onClick}) {
         </UL>
 
         <SystemDialog {...systemDialogState}/>
-        {/* <pre>{JSON.stringify(searches,0,2)}</pre> */}
+        {/* <pre>{JSON.stringify(drawerSearches,0,2)}</pre> */}
         </Drawer>
     </>
 }

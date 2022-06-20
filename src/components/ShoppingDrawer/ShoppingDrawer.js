@@ -379,6 +379,11 @@ export default function ShoppingDrawer ({open, videoDrawerData, onClose, onClick
       const domain = /\w+:\/\/([^/]+)/.exec(v);  
       setState({...state, progress: 1, statusText: `Searching ${v}...`})  
       const res = await getVideosByURL(v); 
+
+      if (res.message) {
+        alert (res.message);
+      }
+
       const addresses = !domain ? [] : res.pages?.map(dressAddress(domain[1])); 
 
       console.log ({ addresses, searchPages})
@@ -504,7 +509,7 @@ export default function ShoppingDrawer ({open, videoDrawerData, onClose, onClick
            
       <Divider />
 
-    {/* list of previous searches */}
+    {/* list of previous lookups */}
      {!!sessionList.length && !progress && <> 
         <Flex>
           <Stack>
