@@ -227,6 +227,7 @@ function useVideoCollection({
     selectedVideos, 
     selectVideo, 
     editMode,
+    searches,
     videoDrawerOpen,
     setState: setComponentState
 } = React.useContext(SplooshContext);
@@ -302,16 +303,45 @@ function useVideoCollection({
 
   const searchVideos = React.useCallback(
     async (str, p, d) => {
-      const method = !!d ? getVideosByDomain : findVideos;
-      const items = await method(str, p);
+      let items;
+      const selectedTab = searches.find(f => f.param === str);
+      const { records } = selectedTab ?? [];
+
+      console.log ({ selectedTab })
+
+      if (!!records?.length) {
+        items = records
+      } else {
+        const method = !!d ? getVideosByDomain : findVideos;
+        items = await method(str, p);
+      }
+
+
+
       const key = !d ? 'search' : 'domain';
       const searchKey$ =  `${key}-${str}-${p}`;
+
+
       console.log({ items });
       setState('response', { ...items , searchKey: searchKey$});
       setState('page', p);
       setState('param', str);
       setState('searchKey', searchKey$);
       refreshSelectedVideos(items);
+
+      if (!selectedTab)  return;
+
+      const tab = {
+        ...selectedTab,
+        ...items,
+        page: p,
+      };
+
+      setComponentState('searches', searches.map(p => {
+        if (p.param === str) return tab;
+        return p;
+      }))
+
     },
     [page]
   );
@@ -340,13 +370,10 @@ function useVideoCollection({
       setState('busy', !0);
       setBusy(!0); 
       switch (collectionType) {
-        case 'search':
-          console.log ('searching for ', s, searchParam, p)
-          await searchVideos(s || searchParam, p);
-          break;
+        case 'search': 
         case 'domain':
           console.log ('searching for ', s, searchParam, p)
-          await searchVideos(s || searchParam, p, !0);
+          await searchVideos(s || searchParam, p, collectionType === 'domain');
           break;
         case 'heart':
           await loadFavorites(p);

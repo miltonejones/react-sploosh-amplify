@@ -279,18 +279,22 @@ const Editor = styled(IconButton)(() => ({
 }))
 
 export const Shorten = ({ children, limit = 40 }) => {
-  const [hover, setHover] = React.useState(false)
+  const [hover, setHover] = React.useState(false);
+  const turnOn = () => {
+    setHover(true);
+    setTimeout(() => setHover(false), 2599)
+  }
   const text = children.toString();
   const edit = !hover 
     ? <i/>
     : <Editor><Edit /></Editor>
   if (hover || text.length <= limit) return <Hover on={hover}
-              onMouseEnter={() => setHover(true)}
+              onMouseEnter={turnOn}
               onMouseLeave={() => setHover(false)}
               >{text}{edit}</Hover>;
   return ( 
       <Box
-      onMouseEnter={() => setHover(true)}
+      onMouseEnter={turnOn}
       className="action">{text.substr(0, limit) + '...'}</Box> 
   );
 };
