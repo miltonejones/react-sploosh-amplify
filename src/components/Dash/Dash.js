@@ -7,8 +7,12 @@ import { importComplete } from '../ShoppingDrawer/ShoppingDrawer';
 import { VideoPersistService } from '../../services/VideoPersist';
 import { getVideoKeys } from '../../connector/DbConnector';
 import VideoCard from '../VideoCard/VideoCard';
-import { ExpandMore } from '@mui/icons-material';
+import { ExpandMore, Sync } from '@mui/icons-material';
 import { ProgressSnackbar } from '../VideoCollection/VideoCollection';
+import { toggleVideoFavorite } from '../../connector/DbConnector';
+import { getFavorites } from '../../connector/DbConnector';
+import { getVideos } from '../../connector/DbConnector';
+import { deleteVideo } from '../../connector/DbConnector';
 
 
 const StarGrid = styled(Box)(({size = 180}) => ({
@@ -77,16 +81,31 @@ export default function Dash (props) {
   const sploosh = useSploosh(props);
   const [dash, setDash] = React.useState(false);
   const [past, setPast] = React.useState(null);
+  const [fave, setFave] = React.useState(null);
+  const [list, setList] = React.useState(null);
   const [modelsShown, setShown] = React.useState(false);
   const [recentShown, setRecentShown] = React.useState(false);
   const [snackProps, setSnackProps] = React.useState({value: 0})
   const { modelModalState, showDialog } = useModelModal();
 
+
+  const refreshLatest = React.useCallback(async () => {
+    const items = await getVideos(1);
+    setList(items.records)
+  }, [])
+
+  const refreshFavorites = React.useCallback(async () => {
+    const items = await getFavorites(1);
+    setFave(items.records);
+    await refreshLatest()
+  }, [])
+
   const refreshRecent = React.useCallback(async () => {
     const videos = await VideoPersistService.get()
     const Keys = videos.slice(0, 40)
     const recent = await getVideoKeys(Keys);
-    setPast(recent.records)
+    setPast(recent.records);
+    await refreshModels()
   }, [])
 
   const refreshModels = React.useCallback(async (msg) => {
@@ -105,26 +124,31 @@ export default function Dash (props) {
 
     const data = await getDash();
     setDash(data);
-    await refreshRecent()
+
+    await refreshFavorites()
   }, [])
 
   React.useEffect(() => {
-    !dash && refreshModels();
-    const sub = importComplete.subscribe(refreshModels);
+    !past && refreshRecent();
+    const sub = importComplete.subscribe(refreshRecent);
     return () => sub.unsubscribe();
-  }, [dash]); 
+  }, [dash, past]); 
 
 
   return <>
-    <Stack sx={{p: 4, ml: 8, mr: 8}}>
+    <Stack sx={{pl: 2, ml: 8, mr: 8, width: 'calc(100vw - 48px)'}}>
  
-
     <RecentLoader past={past} showDialog={showDialog} /> 
-
     <Line />
 
     <ModelLoader dash={dash} showDialog={showDialog}/>
- 
+    <Line />
+
+    <RecentLoader title="Favorites" past={fave} showDialog={showDialog} /> 
+    <Line />
+
+    <RecentLoader title="Latest Added" past={list} showDialog={showDialog} /> 
+    <Line />
 
     </Stack>
 
@@ -137,10 +161,10 @@ const ModelLoader = ({ dash, showDialog }) => {
   const [modelsShown, setShown] = React.useState(false);
 
   if (!dash)  {
-    return <i>Loading...</i>
+    return <i><Sync className="spin" /> Loading models...</i>
   }
 
-  const cutoff = 12;
+  const cutoff = 6;
   
   const sorted = dash.sort((a,b) => b.FaveCount - a.FaveCount);
   const first = sorted.slice(0, cutoff);
@@ -162,11 +186,23 @@ const ModelLoader = ({ dash, showDialog }) => {
 
 }
 
-const RecentLoader = ({ past, showDialog }) => {
+const RecentLoader = ({ past, showDialog, title = 'Recent Videos' }) => {
   const [recentShown, setRecentShown] = React.useState(false);
 
+  const onDrop  = async (ID, title = "this video") => { 
+    const yes = confirm('Are you sure you want to delete ' + title + '?')
+    if (!yes) return;  
+    const res = await deleteVideo(ID);
+    importComplete.next();
+  }
+
+  const onHeart = async (ID) => { 
+    const res = await toggleVideoFavorite(ID); 
+    importComplete.next();
+  }
+
   if (!past)  {
-    return <i>Loading...</i>
+    return <i><Sync className="spin" /> Loading {title}...</i>
   }
 
   const firstPast = past.slice(0, 5);
@@ -175,9 +211,9 @@ const RecentLoader = ({ past, showDialog }) => {
   return <>
   
   <Flex sx={{pr: 4}}>
-      <Typography variant="h6">Recent Videos</Typography> 
+      <Typography variant="h6">{title}</Typography> 
       <Spacer />
-      <u onClick={() => setRecentShown(!recentShown)} className="action">Show {recentShown?'fewer':'more'} recent videos</u>
+      <u onClick={() => setRecentShown(!recentShown)} className="action">Show {recentShown?'fewer':'more'} {title.toLowerCase()}</u>
       <IconButton className={recentShown ? "flipped" : ""}><ExpandMore /></IconButton>
     </Flex>  
 
@@ -186,6 +222,8 @@ const RecentLoader = ({ past, showDialog }) => {
         <VideoCard
           key={video.ID}
           video={video} 
+          onDrop={onDrop}
+          onHeart={onHeart}
           getModel={(q) => {
             showDialog(q);
           }} 
@@ -198,6 +236,7 @@ const RecentLoader = ({ past, showDialog }) => {
         {restPast.filter(f => !!f && f.ID).map((video) => (
           <VideoCard
             key={video.ID}
+            onHeart={onHeart}
             video={video} 
             getModel={(q) => {
               showDialog(q);

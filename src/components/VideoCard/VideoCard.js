@@ -139,23 +139,24 @@ export default function VideoCard({
       
       <Flex sx={{justifyContent: 'center'}}>
         {likeButton}
-        <IconButton onClick={() => {
+       {!!onDrop && <IconButton onClick={() => {
           onDrop(video.ID, video.title);
           setShowMenu(false);
         }}>
           <DeleteForever /> 
-        </IconButton>
+        </IconButton>}
+
         <IconButton onClick={() => setShowMenu(false)} href={video.URL} target="_blank">
           <Launch  /> 
         </IconButton>
 
        {!!video.Key && !small && <>
-        <IconButton onClick={() => {
+        {!!onShop && <IconButton onClick={() => {
           onShop(video.Key)
           setShowMenu(false);
           }} >
           <Search  /> 
-        </IconButton>
+        </IconButton>}
 
         <IconButton  
           onClick={() => setShowMenu(false)}
