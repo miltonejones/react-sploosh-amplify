@@ -1,4 +1,5 @@
 import React from 'react';
+import { getVideoByURL } from './ParserConnector';
 
 const API_ENDPOINT = 'https://3bax4cg6w7.execute-api.us-east-1.amazonaws.com';
 
@@ -52,12 +53,22 @@ export const findVideos = async (param, page = 1) => {
 };
 
 export const addVideo = async (URL) => {
-  const requestOptions = {
-    method: "PUT",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ URL}),
-  };
-  const response = await fetch(API_ENDPOINT + '/add-video', requestOptions);
+
+  const b = await getVideoByURL(URL);
+  const c = await saveVideo(b); 
+
+
+  // const requestOptions = {
+  //   method: "PUT",
+  //   headers: { "Content-Type": "application/json" },
+  //   body: JSON.stringify({ URL }),
+  // };
+  // const response = await fetch(API_ENDPOINT + '/add-video', requestOptions);
+  return c
+};
+
+export const getDash = async () => { 
+  const response = await fetch(API_ENDPOINT + '/dash');
   return await response.json();
 };
 

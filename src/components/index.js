@@ -18,7 +18,8 @@ import {
   UL,
   LI,
   TextBox,
-  Picture
+  Picture,
+  TextBoxes
   } from './Control/Control';
 
 export {
@@ -40,6 +41,7 @@ export {
   Toolbar,
   Tabs,
   TextBox,
+  TextBoxes,
   VideoDrawer,
   useSystemDialog,
   UL,

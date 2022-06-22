@@ -36,7 +36,11 @@ export default function Toolbar ({ viewIndex = 0, setOpen }) {
           <Avatar onClick={() => navigate('/')} sx={{ml: 4, mr: 4}} 
               src="https://s3.amazonaws.com/sploosh.me.uk/assets/sploosh.png" 
               alt="logo" />
-              
+
+
+           <Link 
+              className={screenIndex === -1 ? "link on" : "link"}  
+              to="/">home</Link>    
               
           {pageNames.map((p, i) => (
             <Link 

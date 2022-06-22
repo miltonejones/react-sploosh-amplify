@@ -1,6 +1,7 @@
 .model-modal {
   min-width: 640px;
-  min-height: 600px;
+  min-height: 640px;
+  position: relative;
 }
 
 .ModelVideoGrid {
