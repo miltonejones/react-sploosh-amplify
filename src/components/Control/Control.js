@@ -127,6 +127,20 @@ export const StyledPagination = ({ totalPages, page, handleChange }) => {
   );
 };
 
+const Expando = styled(Box)(({ on }) => ({
+  width: on ? 240 : 0,
+  overflow: 'hidden',
+  transition: 'width 0.2s linear'
+}))
+
+export const TextBoxes = ({textProps, selectedIndex, ...props}) => {
+  return textProps.map((prop, i) => <Expando 
+    key={i} 
+    on={selectedIndex === i}
+    >{selectedIndex === i ? <TextBox {...props} {...prop}/> : <i/>}</Expando>)
+}
+
+
 export const TextBox = ({onChange, onEnter, allowClear, ...props}) => {
   const [value, setValue] = React.useState(props.value);
   const change = e => {

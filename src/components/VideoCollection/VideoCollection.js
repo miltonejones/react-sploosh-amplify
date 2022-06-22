@@ -465,7 +465,7 @@ function useVideoCollection({
   };
 }
 
-const ProgressSnackbar = ({progress = 0, statusText, video, image, open}) => { 
+export const ProgressSnackbar = ({progress = 0, statusText, video, image, open}) => { 
   const photo = video?.image || image;
   return <Snackbar
   anchorOrigin={{ vertical:'bottom', horizontal:'left' }}

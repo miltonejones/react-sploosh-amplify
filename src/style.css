@@ -120,6 +120,10 @@ body {
   min-width: 500px;
 }
 
+.flipped {
+  transform:rotate(180deg);
+}
+
 @keyframes spin {
   from {
       transform:rotate(0deg);

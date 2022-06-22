@@ -2,15 +2,16 @@ import * as React from 'react';
 
 import DialogTitle from '@mui/material/DialogTitle';
 import Dialog from '@mui/material/Dialog';
+import DialogContent from '@mui/material/DialogContent';
 import Avatar from '@mui/material/Avatar';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import { styled, Box, Menu, MenuItem, IconButton, Divider } from '@mui/material';
-import { MoreVert, Close, MenuBook, Shop } from '@mui/icons-material';
+import { MoreVert, Close, MenuBook, Shop, VideoLabel } from '@mui/icons-material';
 import { getModel } from '../../connector/DbConnector';
 import useComponentState from '../../hooks/useComponentState';
-import { VideoCard, StyledPagination, Flex, Tabs, Picture, TextBox } from '../';
+import { VideoCard, StyledPagination, Flex, Tabs, Picture, TextBox, FabGroup, TextBoxes } from '../';
 import './ModelModal.css';
 import { addModelToVideo } from '../../connector/DbConnector';
 import { importComplete } from '../ShoppingDrawer/ShoppingDrawer';
@@ -26,6 +27,8 @@ import ModelSelect from '../ModelSelect/ModelSelect';
 import { addModelAlias } from '../../connector/DbConnector';
 import { SplooshContext } from '../../hooks/useSploosh';
 import { quickSearch } from '../ShoppingDrawer/ShoppingDrawer';
+import { windowChange } from '../../services/WindowManager';
+import { useWindowManager } from '../../services/WindowManager';
 
 
 
@@ -152,6 +155,7 @@ export default function ModelModal(props) {
   const { state, setState } = useComponentState({ 
     page: 1, 
     tabValue: 0, 
+    currentAction: 4,
     response: null  
   });
   const { onClose, selectedId, open, refreshList } = props;
@@ -160,7 +164,7 @@ export default function ModelModal(props) {
     response, 
     tabValue = 0, 
     selectedVideos = [], 
-    modelList = [],
+    modelList = [], 
     currentId = selectedId,
     filterParam,
     costars = []
@@ -170,6 +174,8 @@ export default function ModelModal(props) {
     setState: setSplooshState,  
 } = React.useContext(SplooshContext);
 
+  const WindowManager = useWindowManager()
+  const [windowLength, setWindowLength] = React.useState(0)
   const {  setModelList, getModelList } = useModelList()
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -262,7 +268,14 @@ export default function ModelModal(props) {
       loadModel(id, 1)
       setState('tabValue', 0);
     });
-    return () => sub.unsubscribe();
+    const win = windowChange.subscribe(on => { 
+      setWindowLength(WindowManager.getLength())
+    })
+
+    return () => {
+      win.unsubscribe();
+      sub.unsubscribe();
+    }
   }, [response, selectedId, currentId, state]);
 
   if (!response) return <i />;
@@ -276,7 +289,7 @@ export default function ModelModal(props) {
     const b = await getVideoByURL(uri);
     const c = await saveVideo(b); 
     const d = await addModelToVideo(c, currentId) 
-    setState('currentAction', null);
+    setState('currentAction', 4);
     setState('boxParam', '')
     loadModel(currentId, 1);
     importComplete.next();
@@ -315,24 +328,41 @@ export default function ModelModal(props) {
   } 
 
   let textProps;
+  const propsList = [
+    {
+      placeholder: 'Enter video URL',
+      label: 'Add video',
+      sx: {ml: 3, maxWidth: 240}
+    },
+    {
+      placeholder: 'Enter image URL',
+      label: 'Set model photo',
+      sx: {ml: 3, maxWidth: 240}
+    },
+    {
+      placeholder: 'Filter videos',
+      label: 'Search',
+      sx: {ml: 3, maxWidth: 240}
+    },
+  ]
 
   switch(state.currentAction) {
     case 2:
       textProps = {
         placeholder: 'Enter video URL',
-        label: 'Add video',
+        label: 'Add video', 
         sx: {ml: 3, maxWidth: 240}
       }
       break;
     case 3:
       textProps = {
         placeholder: 'Enter image URL',
-        label: 'Set model photo',
+        label: 'Set model photo', 
         sx: {ml: 3, maxWidth: 240}
       }
       break;
     default:
-      textProps = {
+      textProps = { 
         placeholder: 'Filter videos',
         label: 'Search',
         sx: {ml: 3, maxWidth: 240}
@@ -341,6 +371,67 @@ export default function ModelModal(props) {
 
   const missingLabel = !!state.missingModel?.length ? "Missing" : [];
   const missingTab = !state.missingModel ? "Checking..." : missingLabel;
+
+  const handleCurrentAction = async (v, action) => {
+    // video - 0/2
+    if (action === 2) {
+      await addVideo(v);
+      importComplete.next();
+      return;
+    }
+
+    // image - 1/3
+    if (action === 3) {
+      await updateModelPhoto(currentId, v);
+      setState('currentAction', 4);
+      setState('boxParam', '');
+      loadModel(currentId, 1);
+      importComplete.next();
+      return;
+    }
+
+    // search - 2
+    loadModel(currentId, 1, false, v);
+  };
+
+  const checkClipboard = async (b) => {
+    const text = await navigator.clipboard.readText(); 
+    
+    setState('currentAction', b);
+    setAnchorEl(null);
+
+    if (!!text) {
+      const auto = confirm(`Use "${text}" from clipboard?`);
+      if (auto) {
+        return handleCurrentAction(text, b)
+      }
+    }
+
+  }
+
+  const shop = () => {
+    setSplooshState('videoDrawerOpen', true);
+    setSplooshState('videoDrawerData', model.name);
+    setTimeout(() => quickSearch.next(), 999)
+    handleClose();
+  }
+ 
+
+  const dialogButtons = [
+    {
+      icon: <Close />,
+      onClick: () => WindowManager.exit()
+    },
+    {
+      icon: <VideoLabel />,
+      onClick: () => WindowManager.focus()
+    },
+    {
+      icon:  <Shop />,
+      onClick: shop
+    }
+  ]
+ 
 
   return (
     <Dialog
@@ -359,37 +450,22 @@ export default function ModelModal(props) {
 
           {state.currentAction === 1 && <ModelSelect sx={{ml: 3}}  onSelect={async (ID) => { 
             await addModelAlias(currentId, ID);
-            setState('currentAction', null);
+            setState('currentAction', 4);
             setState('boxParam', '');
             loadModel(currentId, 1); 
           }} />}
 
           {/* search+/image+/video+ text box */}
-          {state.currentAction !== 1 && <TextBox sx={{ml: 3}} 
-            allowClear
+          {state.currentAction !== 1 && <TextBoxes sx={{ml: 3}} 
+            allowClear 
             value={state.boxParam}
             onChange={x => setState('boxParam', x)}
-            onEnter={async (v) => {
-              if (state.currentAction === 2) {
-                await addVideo(v);
-                return;
-              }
+            onEnter={v => handleCurrentAction(v, state.currentAction)}
+            selectedIndex={(state.currentAction || 4) - 2}
+            textProps={propsList}
+            />}
 
-              if (state.currentAction === 3) {
-                await updateModelPhoto(currentId, v);
-                
-                setState('currentAction', null);
-                setState('boxParam', '');
-                loadModel(currentId, 1);
-                importComplete.next();
-                return;
-              }
-              
-              loadModel(currentId, 1, false, v);
-            }}
-            {...textProps} />}
-
-         {!!state.currentAction && <IconButton onClick={() => setState('currentAction', null)}>
+         {state.currentAction !== 4 && <IconButton onClick={() => setState('currentAction', 4)}>
             <Close />
           </IconButton>}
           
@@ -408,10 +484,7 @@ export default function ModelModal(props) {
         aliases={aliases}
         selected={currentId}
         currentAction={state.currentAction}
-        onAction={(b) => {
-          setState('currentAction', b);
-          setAnchorEl(null);
-        }}
+        onAction={checkClipboard}
         onClose={() => setAnchorEl(null)}
         onClick={(v) => { 
           loadModel(v, 1)
@@ -419,6 +492,7 @@ export default function ModelModal(props) {
         }}
         anchorEl={anchorEl} />
       </DialogTitle>
+      <DialogContent sx={{p: 0, m: 0, position: 'relative'}}>
       <Tabs 
         sx={{ml: 1}}
         onChange={handleTabs} 
@@ -432,20 +506,15 @@ export default function ModelModal(props) {
           <Box sx={{flexGrow: 1}} />
 
 
-         {tabValue === 0 && <> 
+         {/* {tabValue === 0 && <> 
          <IconButton target="_blank" href={`https://www.google.com/search?q=${model.name}%20xxx&source=lnms&tbm=isch`}>
             <MenuBook />
           </IconButton>
 
-          <IconButton onClick={() => {
-            setSplooshState('videoDrawerOpen', true);
-            setSplooshState('videoDrawerData', model.name);
-            setTimeout(() => quickSearch.next(), 999)
-            handleClose();
-          }}>
+          <IconButton onClick={shop}>
             <Shop />
           </IconButton>
-          </>}
+          </>} */}
         </Flex>
      
       {tabValue === 1 && !!shownCostars.length && <StarGrid>
@@ -485,7 +554,15 @@ export default function ModelModal(props) {
         ))}
       </div>}
 
-
+      <FabGroup 
+        position="absolute"
+        mainClick={v =>{
+          window.open(`https://www.google.com/search?q=${model.name}%20xxx&source=lnms&tbm=isch`)
+        }}
+        icon={<MenuBook />}
+        buttons={dialogButtons}
+      />
+      </DialogContent>
     </Dialog>
   );
 }

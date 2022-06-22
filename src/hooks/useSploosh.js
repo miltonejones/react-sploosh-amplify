@@ -26,17 +26,18 @@ export default function useSploosh ({ queryType, pageIndex }) {
       busy: false, 
       searches: [],
       editMode: false,
+      search_check: false,
       selectedVideos: [],
       candidateVideos: [] 
     });
     const { page, param, collectionType, searches, busy, search_check, selectedVideos, candidateVideos, editMode } = state;
     const { modelModalState, showDialog } = useModelModal();
 
-    React.useEffect(() => {
+    React.useEffect(() => { 
       !searches?.length && !search_check && (async () => {
-        const tabs = await store.getItem('search-tabs'); 
-        setState('search_check', !0)
-        setState('searches', !tabs ? [] : JSON.parse(tabs)) 
+        const tabs = await store.getItem('search-tabs');  
+        setState('search_check', collectionType === 'video' && !!tabs)
+        setState('searches', JSON.parse(tabs)) 
       })();
     }, [searches, search_check]);
 
@@ -91,7 +92,7 @@ export default function useSploosh ({ queryType, pageIndex }) {
     const SearchIcon = busy ? Sync : Search;
     const iconClass = busy ? 'spin' : '';
     const pageNames = [
-      {label:'videos',href:'/'}, 
+      {label:'videos',href:'/video/1'}, 
       {label:'favorites',href:'/heart/1'}, 
       {label:'recently seen',href:'/recent/1'}, 
       {label:'models',href:'/model/1'}, 

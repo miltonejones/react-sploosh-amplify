@@ -15,12 +15,13 @@ export default function FabGroup ({
   icon,
   color = 'primary',
   buttons = [],  
-  mainClick
+  mainClick,
+  position = 'fixed'
 }) {
   const [on, setOn] = React.useState(false);
 
   const boxStyle = {
-    position: 'fixed',
+    position,
     bottom: 20,
     right: 20,
     zIndex: 1000,

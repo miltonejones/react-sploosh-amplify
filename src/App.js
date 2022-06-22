@@ -16,8 +16,9 @@ import useSploosh, { SplooshContext } from './hooks/useSploosh';
 import  { getModelsByName } from './connector/DbConnector';
 import { VideoDrawer } from './components';
 import ShoppingDrawer from './components/ShoppingDrawer/ShoppingDrawer';
+import Dash from './components/Dash/Dash';
 
-function VideoGrid (props) {
+function VideoGrid ({tag, ...props}) {
   const sploosh = useSploosh(props);
   const {  
     search,
@@ -46,7 +47,8 @@ function VideoGrid (props) {
     navigate(`/${s.type}/${s.param}/1`)  
   };
 
-  const Component = pageIndex < 3 ? VideoCollection : ModelGrid;
+  const Tag = tag || VideoCollection;
+  const Component = pageIndex < 3 ? Tag : ModelGrid;
 
   React.useEffect(() => { 
     if (loaded) return; 
@@ -126,7 +128,7 @@ function VideoGrid (props) {
 export default function App() {
   return <BrowserRouter>
     <Routes>
-      <Route path="/" element={<VideoGrid  pageIndex={0}/>} />
+      <Route path="/" element={<VideoGrid pageIndex={-1} tag={Dash} queryType="dash"  />} />
       <Route path="/model/:videoPageNum" element={<VideoGrid pageIndex={3} queryType="model"  />} />
       <Route path="/recent/:videoPageNum" element={<VideoGrid pageIndex={2} queryType="recent" />} />
       <Route path="/heart/:videoPageNum" element={<VideoGrid pageIndex={1} queryType="heart" />} />
