@@ -34,7 +34,7 @@ export default function useSploosh ({ queryType, pageIndex }) {
     const { modelModalState, showDialog } = useModelModal();
 
     React.useEffect(() => { 
-      !searches?.length && !search_check && (async () => {
+      !searches?.length &&  (async () => {
         const tabs = await store.getItem('search-tabs');  
         setState('search_check', collectionType === 'video' && !!tabs)
         setState('searches', JSON.parse(tabs)) 

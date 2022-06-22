@@ -71,7 +71,7 @@ function VideoGrid ({tag, ...props}) {
          <Flex spaced fullWidth>
 
           
-          {collectionType === 'video' &&  <Tabs onChange={handleChange} 
+          {<Tabs onChange={handleChange} 
             removeTab={removeTab} 
             value={tabValue} 
             sx={{mt: 0.5}}
