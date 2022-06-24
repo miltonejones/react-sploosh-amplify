@@ -53,17 +53,8 @@ export const findVideos = async (param, page = 1) => {
 };
 
 export const addVideo = async (URL) => {
-
   const b = await getVideoByURL(URL);
-  const c = await saveVideo(b); 
-
-
-  // const requestOptions = {
-  //   method: "PUT",
-  //   headers: { "Content-Type": "application/json" },
-  //   body: JSON.stringify({ URL }),
-  // };
-  // const response = await fetch(API_ENDPOINT + '/add-video', requestOptions);
+  const c = await saveVideo(b);  
   return c
 };
 

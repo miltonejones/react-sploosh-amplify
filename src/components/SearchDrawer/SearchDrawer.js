@@ -47,7 +47,8 @@ const LI = styled('li')(({header}) => ({
 
 
 export default function SearchDrawer ({open, onClose, onClick}) {
-    const [drawerSearches, setSearches] = React.useState(null)
+  const [drawerSearches, setSearches] = React.useState(null);
+  const [busy, setBusy] = React.useState(null);
     const { systemDialogState, Prompt, Confirm } = useSystemDialog();
 
     const pinSearch = async (value) => {
@@ -72,13 +73,13 @@ export default function SearchDrawer ({open, onClose, onClick}) {
     }
 
     React.useEffect(() => {
-        !drawerSearches && (async()=>{
+        !drawerSearches && !busy && (async()=>{
+          setBusy(true)
           const existing = await SearchPersistService.getSavedSearches();
           setSearches(existing)
+          setBusy(false)
         })()
-    }, [drawerSearches])
-
-    console.log ({drawerSearches})
+    }, [drawerSearches, busy]);
 
     const pinned = drawerSearches?.filter (f => f && f.indexOf('^') > 0).map(f => f.replace('^', ''));
     const unpinned = drawerSearches?.filter (f => f && f.indexOf('^') < 0);

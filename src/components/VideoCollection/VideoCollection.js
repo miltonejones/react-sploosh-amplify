@@ -351,10 +351,12 @@ function useVideoCollection({
     
     console.log ({ records, selectedVideos });
 
+    const createdKey = createKey();
     const updated = selectedVideos.map(f => records.find(e => e.ID === f.ID));
     setComponentState('selectedVideos', updated)
     setComponentState('candidateVideos', [])
     setComponentState('editMode', false)
+    setState(createdKey, records)
   }
 
   const toggleEditMode = () => { 
@@ -410,10 +412,22 @@ function useVideoCollection({
   React.useEffect(() => {
     if (busy) return;
     if (loaded) return; 
-    const renew = searchKey !== createKey();
-    console.log({pageNum, page, param, searchParam, searchKey}, 
-            [createKey(), response.searchKey, renew.toString(), response]);
+    const createdKey = createKey();
+    const renew = searchKey !== createdKey;
+    
+    if (state[createKey]) return;
+
+    console.log({
+      pageNum, 
+      page, 
+      param, 
+      searchParam, 
+      searchKey
+    }, 
+    [createKey(), response.searchKey, renew.toString(), response]);
+
     (!!renew || !response.records) && load(pageNum, collectionType, searchParam);
+
   }, [response, busy, pageNum, page, collectionType, type, param, searchParam]);
 
   const closeVideoPanel = () => {
