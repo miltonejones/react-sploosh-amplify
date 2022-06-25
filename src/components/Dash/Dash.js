@@ -114,8 +114,7 @@ export default function Dash (props) {
       console.log ({ msg })
       setSnackProps({...msg, open: !sploosh.videoDrawerOpen});
       if (msg.complete) {
-        setSnackProps({...msg, open: !1});
-        // return openShoppingCart()
+        setSnackProps({...msg, open: !1}); 
       }
       return;
     }
@@ -144,10 +143,10 @@ export default function Dash (props) {
     <ModelLoader dash={dash} showDialog={showDialog}/>
     <Line />
 
-    <RecentLoader title="Favorites" past={fave} showDialog={showDialog} /> 
+    <RecentLoader title="Latest Added" past={list} showDialog={showDialog} /> 
     <Line />
 
-    <RecentLoader title="Latest Added" past={list} showDialog={showDialog} /> 
+    <RecentLoader title="Favorites" past={fave} showDialog={showDialog} /> 
     <Line />
 
     </Stack>
@@ -186,7 +185,7 @@ const ModelLoader = ({ dash, showDialog }) => {
 
 }
 
-const RecentLoader = ({ past, showDialog, title = 'Recent Videos' }) => {
+const RecentLoader = ({ past, showDialog, title = 'Recently Watched Videos' }) => {
   const [recentShown, setRecentShown] = React.useState(false);
 
   const onDrop  = async (ID, title = "this video") => { 
