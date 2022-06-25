@@ -67,8 +67,9 @@ const ParserList = ({ parserList: list, selectedParsers, selectParser }) => {
   </>
 }
 
-const Frame = styled(Stack)(({selected }) => ({
-  outline: selected ? 'dotted 2px #37a' : 'none' 
+const Frame = styled(Stack)(({ matches, selected }) => ({
+  outline: selected ? 'dotted 2px #37a' : 'none' ,
+  border: `solid 1px ${matches ? '#37a' : 'white'}`
 }))
 
 const Text = styled(Typography)(({ fullWidth, error  }) => ({
@@ -361,9 +362,12 @@ export default function ShoppingDrawer ({open, videoDrawerData, onClose, onClick
       searchPages: searchPages
       .filter(f => !!f && !pages?.some(e => !!e && e[0] === f[0] && e[2] === f[2]))  
       .concat(pages), 
-      searchResults: out, 
+      searchResults: out.map(f => {
+        f.matches = !!f?.Text && f.Text.toLowerCase().indexOf(v.toLowerCase()) > -1
+        return f;
+      }), 
     };
-
+console.log ({ results, v})
     return results;
 
   }
@@ -645,14 +649,15 @@ const ResultTitle = styled(Box)(({ on }) => ({
 }));
 
 const Thumb = ({res, onClick, ...props}) => {
-  return <Tooltip title={res.Text}><Frame {...props} 
+  const variant = res.matches ? 'subtitle2' : 'body2'
+  return <Tooltip title={res.Text}><Frame {...props} matches={res.matches}
     sx={{padding: '0 10px', maxWidth: 140, opacity: res.existing ? 0.3 : 1}}>
     <Picture onClick={onClick} {...props} 
      key={res.Text} src={res.Photo} alt={res.Text} 
      sx={{width: 140, height: 80}} />
     <Text onClick={() => {
       window.open(res.URL)
-    }} variant="body2">{res.Text}</Text> 
+    }} variant={variant}>{res.Text}</Text> 
     <Flex spaced>
       <Text variant="caption">{res.domain}</Text>
       <Text variant="caption">{res.Time}</Text> 

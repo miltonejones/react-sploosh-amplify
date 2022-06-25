@@ -85,11 +85,11 @@ const getImage = (src) => new Promise((yes, no) => {
       .then(yes)
       .catch(no); 
   } 
-  if (src.indexOf('http') < 0) {
-    return downloadImage('https:'+src)
-      .then(yes)
-      .catch(no); 
-  }
+  // if (src.indexOf('http') < 0) {
+  //   return downloadImage('https:'+src)
+  //     .then(yes)
+  //     .catch(no); 
+  // }
   im.src = src;
 })
 

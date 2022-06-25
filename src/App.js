@@ -71,7 +71,7 @@ function VideoGrid ({tag, ...props}) {
          <Flex spaced fullWidth>
 
           
-          {<Tabs onChange={handleChange} 
+          {!props.notabs && <Tabs onChange={handleChange} 
             removeTab={removeTab} 
             value={tabValue} 
             sx={{mt: 0.5}}
@@ -128,7 +128,7 @@ function VideoGrid ({tag, ...props}) {
 export default function App() {
   return <BrowserRouter>
     <Routes>
-      <Route path="/" element={<VideoGrid pageIndex={-1} tag={Dash} queryType="dash"  />} />
+      <Route path="/" element={<VideoGrid pageIndex={-1} tag={Dash} notabs queryType="dash"  />} />
       <Route path="/model/:videoPageNum" element={<VideoGrid pageIndex={3} queryType="model"  />} />
       <Route path="/recent/:videoPageNum" element={<VideoGrid pageIndex={2} queryType="recent" />} />
       <Route path="/heart/:videoPageNum" element={<VideoGrid pageIndex={1} queryType="heart" />} />
