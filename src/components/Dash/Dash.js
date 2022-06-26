@@ -70,12 +70,10 @@ const StarCount = styled(Typography)(({}) => ({
   color: '#fff'
 }));
 
-
 const Line = styled(Divider)({
   margin: '8px 0',
   width: '100%'
 })
-
 
 export default function Dash (props) {
   const sploosh = useSploosh(props);
