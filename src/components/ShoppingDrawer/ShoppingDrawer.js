@@ -362,7 +362,9 @@ export default function ShoppingDrawer ({open, videoDrawerData, onClose, onClick
       searchPages: searchPages
       .filter(f => !!f && !pages?.some(e => !!e && e[0] === f[0] && e[2] === f[2]))  
       .concat(pages), 
-      searchResults: out.map(f => {
+      searchResults: out
+      .filter(f => !!f)
+      .map(f => {
         f.matches = !!f?.Text && f.Text.toLowerCase().indexOf(v.toLowerCase()) > -1
         return f;
       }), 
