@@ -7,7 +7,7 @@ import { Avatar, Box, IconButton, CardActionArea, Collapse, styled } from '@mui/
 import Tooltip from '@mui/material/Tooltip';
 import { RegionMenu } from '../';
 // import { WindowManagerService } from '../../services/WindowManager';
-import { Favorite, DeleteForever, Launch, Edit, MoreVert, Search, MenuBook } from '@mui/icons-material';
+import { Favorite, DeleteForever, MoreHoriz, Launch, Edit, MoreVert, Search, MenuBook } from '@mui/icons-material';
 import { useWindowManager } from '../../services/WindowManager';
 
 const ERR_IMAGE = 'https://s3.amazonaws.com/sploosh.me.uk/assets/XXX.jpg';
@@ -182,10 +182,9 @@ export default function VideoCard({
               ml={!!video.models.length ? 2 : 0}
               variant="body2"
               color="text.secondary"
-              onClick={() => onClick && onClick(video)}
               classes={{root: video.favorite ? "favorite" : ""}}
             >
-              <Shorten limit={!!video.models.length ? 35 : 50}>
+              <Shorten onClick={() => onClick && onClick(video)} limit={!!video.models.length ? 35 : 50}>
                {video.title}
               </Shorten>
             </Typography>
@@ -273,29 +272,36 @@ const Hover = styled(Box)(({ on }) => ({
   outlineOffset: 4
 }))
 
-const Editor = styled(IconButton)(() => ({
+const Editor = styled(IconButton)(({ flipped }) => ({
   top: 0,
   right: 0,
+  transform: flipped ? 'rotate(-90deg)' : 'rotate(0deg)',
+  transition: 'transform 0.2s linear',
   position: 'absolute'
 }))
 
-export const Shorten = ({ children, limit = 40 }) => {
+export const Shorten = ({ children, onClick, limit = 40 }) => {
   const [hover, setHover] = React.useState(false);
+  const [shown, setShown] = React.useState(false);
   const turnOn = () => {
-    setHover(true);
-    setTimeout(() => setHover(false), 2599)
+    setHover(true); 
+  }
+  const turnOff = () => {
+    setHover(false);
+    setShown(false)
   }
   const text = children.toString();
   const edit = !hover 
     ? <i/>
-    : <Editor><Edit /></Editor>
-  if (hover || text.length <= limit) return <Hover on={hover}
-              onMouseEnter={turnOn}
-              onMouseLeave={() => setHover(false)}
-              >{text}{edit}</Hover>;
+    : <Editor flipped={shown} onClick={() => setShown(!shown)}><MoreHoriz /></Editor>
+  if (shown || text.length <= limit) return <Hover on={shown}>{text}{edit}</Hover>;
   return ( 
-      <Box
-      onMouseEnter={turnOn}
-      className="action">{text.substr(0, limit) + '...'}</Box> 
+      <Hover
+        onMouseEnter={turnOn}
+        onMouseLeave={turnOff}
+        className="action">
+        <Box onClick={onClick}>{text.substr(0, limit) + '...'}</Box>
+        {edit}
+      </Hover> 
   );
 };
