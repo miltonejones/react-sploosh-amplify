@@ -19,7 +19,8 @@ import {
   LI,
   TextBox,
   Picture,
-  TextBoxes
+  TextBoxes,
+  StarCaster
   } from './Control/Control';
 
 export {
@@ -46,5 +47,6 @@ export {
   useSystemDialog,
   UL,
   LI,
-  Picture
+  Picture,
+  StarCaster
 };

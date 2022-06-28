@@ -36,6 +36,7 @@ import VideoDrawer from '../VideoDrawer/VideoDrawer';
 import { importComplete } from '../ShoppingDrawer/ShoppingDrawer';
 import { quickSearch } from '../ShoppingDrawer/ShoppingDrawer';
 import { getVideosByDomain } from '../../connector/DbConnector';
+import { getModelsByTitle } from '../../connector/DbConnector';
 
 
 
@@ -122,6 +123,10 @@ export default function VideoCollection(props) {
     }
   ]
 
+  const onModel = async(video) => {
+   refreshList()
+  }
+
   const EditIcon = !!editMode
     ? <Badge color="primary" badgeContent={candidateVideos?.length}><CheckBox className={iconClass} /></Badge>
     : <Edit className={iconClass} />
@@ -174,6 +179,7 @@ export default function VideoCollection(props) {
               getModel={(q) => {
                 showDialog(q);
               }}
+              onModel={onModel}
               onHeart={onHeart}
               onDrop={onDrop}
               onSearch={onChange}

@@ -16,7 +16,9 @@ import {
   styled,
   InputAdornment
 } from '@mui/material';
-import { Close } from '@mui/icons-material';
+import { Close, Add, Refresh } from '@mui/icons-material';
+import { findVideos } from '../../connector/DbConnector';
+import { addModelToVideo } from '../../connector/DbConnector';
 
 
 export const Flex = styled(Box)(({align = 'center', spaced, fullWidth}) => ({
@@ -281,4 +283,67 @@ export const LI = styled('li')(({ header, dense, selected }) => ({
       },
     },
   },
-}))
+}));
+
+export const StarCaster = ({ Key, ID, models, videoFail, videoChanged }) => {
+  const [status, setStatus] = React.useState('Add model...')
+  const [className, setClass] = React.useState('')
+
+  const castModel = async (id, stars, index = 0) => {
+    if (index < stars.length) { 
+      const cast = await addModelToVideo(id, stars[index].ID); 
+      return await castModel(id, stars, ++index);
+    } 
+    return false;
+  }
+
+  const done = () => {
+    setStatus('Add model...');
+    setClass('');
+  }
+
+  const go = () => {
+    setStatus('Looking up model...');
+    setClass('spin');
+  }
+
+  const fail = () => {
+    setStatus('No model found');
+    setClass('');
+    videoFail && videoFail()
+  }
+
+  const onModel = async() => {
+    if (!Key) return done();
+    go()
+    const filter = models => f => !models.length || !models.some(m => m.ID === f.ID);
+    const otherVideos = await findVideos(Key);
+    const matchingVideos = otherVideos.records.filter(f => 
+      f.Key === Key && 
+      f.ID !== ID && 
+      !!f.models?.length
+      );  
+    if (!matchingVideos.length) return fail();
+    const result = matchingVideos[0].models.filter(filter(models));
+    if (result?.length) {
+      setStatus('Updating video...');
+      await castModel(ID, result); 
+      videoChanged && videoChanged();
+      done();
+      return;
+    }
+    fail()
+  }
+
+  const Icon = className === 'spin'
+    ? Refresh
+    : Add
+
+  return  <Flex><b>Models: </b> <Icon className={className} sx={{w:16,h:16}} /> 
+    <b className="red action">
+  <u onClick={() => onModel()}>
+  {status}
+  </u> 
+</b> 
+  </Flex>
+}
