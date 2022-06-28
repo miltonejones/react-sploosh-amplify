@@ -29,6 +29,7 @@ import { SplooshContext } from '../../hooks/useSploosh';
 import { quickSearch } from '../ShoppingDrawer/ShoppingDrawer';
 import { windowChange } from '../../services/WindowManager';
 import { useWindowManager } from '../../services/WindowManager';
+import { findVideos } from '../../connector/DbConnector';
 
 
 
@@ -285,9 +286,25 @@ export default function ModelModal(props) {
     importComplete.next();
   }
   const addVideo = async (uri) => {
+
+    const regex=/\w+\-\d+$/
+
+    if (regex.exec(uri)) {
+      const track = await findVideos(uri);
+      const { records } = track || {};
+      if (!records?.length) return;
+      await addModelToVideo(records[0].ID, currentId) ;
+      importComplete.next(); 
+      return;
+    }
     
     const b = await getVideoByURL(uri);
     const c = await saveVideo(b); 
+
+    if (c?.error) {
+      return alert (c.error)
+    }
+
     const d = await addModelToVideo(c, currentId) 
     setState('currentAction', 4);
     setState('boxParam', '')

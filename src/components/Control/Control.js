@@ -330,6 +330,7 @@ export const StarCaster = ({ Key, ID, models, videoFail, videoChanged }) => {
       await castModel(ID, result); 
       videoChanged && videoChanged();
       done();
+      setStatus('Please wait...');
       return;
     }
     fail()
