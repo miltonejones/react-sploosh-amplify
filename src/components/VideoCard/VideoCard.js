@@ -5,7 +5,7 @@ import CardMedia from '@mui/material/CardMedia';
 import Typography from '@mui/material/Typography';
 import { Avatar, Box, IconButton, CardActionArea, Collapse, styled } from '@mui/material';
 import Tooltip from '@mui/material/Tooltip';
-import { RegionMenu } from '../';
+import { RegionMenu, StarCaster } from '../';
 // import { WindowManagerService } from '../../services/WindowManager';
 import { Favorite, DeleteForever, MoreHoriz, Launch, Edit, MoreVert, Search, MenuBook } from '@mui/icons-material';
 import { useWindowManager } from '../../services/WindowManager';
@@ -59,6 +59,7 @@ export default function VideoCard({
   small, 
   onDrop, 
   onHeart, 
+  onModel,
   selected, 
   readonly,
   onShop,
@@ -191,10 +192,10 @@ export default function VideoCard({
           </Flex>
             
           <Typography variant="caption" color="text.secondary">
-            <b>Models:</b>{' '}
 
             {!!video.models.length && (
               <>
+            <b>Models:</b>{' '}
                 <u className="action" onClick={() => getModel(video.models[0].ID)}>
                   <ModelName {...video.models[0]} /> 
                 </u>{' '}
@@ -206,11 +207,12 @@ export default function VideoCard({
               </> 
             )}
             {!video.models.length && (
-              <b className="red action">
-                <u onClick={() => onClick && onClick(video)}>
-                  Add model...
-                </u> 
-              </b> 
+              <StarCaster {...video} videoFail={() => onClick &&  onClick(video)} videoChanged={onModel} />
+              // <b className="red action">
+              //   <u onClick={() => onModel && onModel(video)}>
+              //     Add model...
+              //   </u> 
+              // </b> 
             )}
           </Typography>
             
