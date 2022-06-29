@@ -104,13 +104,27 @@ export default function VideoCollection(props) {
   const totalPages = Math.ceil(count / 30);
 
   const add = async () => {
-    const URL = await Prompt('Type or paste video URL:', false, 'Add Video')
+
+    const insert = async (t) => {
+      
+      const id = await addVideo(t);
+      refreshList();
+    }
+    
+    const text = await navigator.clipboard.readText(); 
+    if (!!text) {
+      const auto = confirm(`Use "${text}" from clipboard?`);
+      if (auto) {
+        return await insert(text)
+      }
+    }
+
+ 
+    const URL = await Prompt('Type or paste video URL:', '', 'Add Video')
   
     // const URL = prompt ('Enter video URL');
     if (!URL) return; 
-    const id = await addVideo(URL);
-    // alert (id + ' was added');
-    refreshList();
+    await insert(URL); 
   } 
   const windowButtons = [
     {

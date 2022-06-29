@@ -66,6 +66,7 @@ export default function VideoCard({
   chosen 
 }) {
   const [open, setOpen] = React.useState(false);
+  const [cursor, setCursor] = React.useState("pointer");
   const [src, setSrc] = React.useState(ERR_IMAGE);
   const [showModels, setShowModels] = React.useState(false);
   const [showMenu, setShowMenu] = React.useState(false);
@@ -98,6 +99,7 @@ export default function VideoCard({
 
   return (
     <View 
+    style={ { cursor }}
     onMouseLeave={() => setShowMenu(false)}
     opacity={opacity}
     selected={selected}
@@ -128,8 +130,10 @@ export default function VideoCard({
 
       <RegionMenu
         {...menuProps}
-        click={(i) => {
-          WindowManager.launch(video, i);
+        click={async (i) => {
+          setCursor("progress")
+          await WindowManager.launch(video, i);
+          setCursor("pointer")
           setOpen(false);
         }}
         open={open}
@@ -174,7 +178,7 @@ export default function VideoCard({
         <CardContent>
           <Flex sx={{ width: '100%' }}>
             {!!video.models.length && (
-              <Avatar
+              <Circle
                 src={video.models[0].image}
                 alt={video.models[0].Name}
               />
@@ -247,8 +251,27 @@ export default function VideoCard({
   );
 }
 
+const useImageLoader = (src) => {
+  const [source, setSource] = React.useState(null);
+  React.useEffect(() => {
+    const im = new Image();
+    im.onload = () => !!im && im.width > 10 && setSource(src);
+    im.src = src;
+  }, [src])
+  return { source }
+}
+
+const Circle = ({src, alt}) => {
+  const { source } = useImageLoader(src) 
+  if (!source) {
+    return <Avatar>{alt.substr(0, 1)}</Avatar>
+  }
+  return <Avatar src={source} alt={alt} />
+}
+
 const ModelName = ({Name, image}) => {
-  if (!image) return Name;
+  const { source } = useImageLoader(image) 
+  if (!source) return Name;
   return (
     <Tip title={<img className="model-image" src={image} alt={Name} />}>
       <span>{Name}</span>
