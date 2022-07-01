@@ -3,72 +3,70 @@ import { TextField, Box , Avatar, IconButton, InputAdornment } from '@mui/materi
 import { Search, Menu , Shop} from '@mui/icons-material';
 import { Flex, Spacer } from '../';
 import useSploosh, { SplooshContext }  from '../../hooks/useSploosh';
-import {  
-    Link
-  } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 export default function Toolbar ({ viewIndex = 0, setOpen }) {
 
-    // const sploosh = useSploosh({});
-    const {
-        setState,
-        navigate,
-        pageNames,
-        pageIndex = 0,
-        iconClass,
-        SearchIcon,
-        searchDrawerOpen,
-        search,
-        param
-    } = React.useContext(SplooshContext);
+  const {
+      setState,
+      navigate,
+      pageNames,
+      pageIndex = 0,
+      iconClass,
+      SearchIcon,
+      searchDrawerOpen,
+      search,
+      param
+  } = React.useContext(SplooshContext);
 
-    const screenIndex = viewIndex || pageIndex;
+  const screenIndex = viewIndex || pageIndex;
 
-    return (<>
-          {/* toolbar */}
+  return (<>
     <Box className="toolbar">
-        <Flex sx={{ textAlign: 'left' }}>
+      <Flex sx={{ textAlign: 'left' }}>
 
-          <IconButton onClick={() => setState('searchDrawerOpen', !searchDrawerOpen)}>
-            <Menu />
-          </IconButton>
+        <IconButton onClick={() => setState('searchDrawerOpen', !searchDrawerOpen)}>
+          <Menu />
+        </IconButton>
 
-          <Avatar onClick={() => navigate('/')} sx={{ml: 4, mr: 4}} 
-              src="https://s3.amazonaws.com/sploosh.me.uk/assets/sploosh.png" 
-              alt="logo" />
+        <Avatar onClick={() => navigate('/')} sx={{ ml: 4, mr: 4 }} 
+          src="https://s3.amazonaws.com/sploosh.me.uk/assets/sploosh.png" 
+          alt="logo" />
 
+        <Link 
+          className={screenIndex === -1 ? "link on" : "link"}  
+          to="/">home</Link>    
+            
+        {pageNames.map((p, i) => (
+          <Link 
+            className={screenIndex === i ? "link on" : "link"} 
+            key={p.href} 
+            to={p.href}>{p.label}</Link>))
+        }
 
-           <Link 
-              className={screenIndex === -1 ? "link on" : "link"}  
-              to="/">home</Link>    
-              
-          {pageNames.map((p, i) => (
-            <Link 
-              className={screenIndex === i ? "link on" : "link"} 
-              key={p.href} 
-              to={p.href}>{p.label}</Link>))}
+        <Spacer />
 
-          <Spacer />
-          <TextField  
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <SearchIcon className={iconClass} />
-                </InputAdornment>
-              ),
-            }}
-            size="small"
-            label="Search"
-            placeholder="Enter search params"
-            value={param}
-            onKeyUp={(e) => e.keyCode === 13 && search()}
-            onChange={(e) => setState('param', e.target.value)}
-          />
-          <IconButton onClick={setOpen}>
-            <Shop />
-          </IconButton>
-        </Flex>
-      </Box>
+        <TextField  
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <SearchIcon className={iconClass} />
+              </InputAdornment>
+            ),
+          }}
+          size="small" 
+          label="Search"
+          placeholder="Enter search params"
+          value={param}
+          onKeyUp={(e) => e.keyCode === 13 && search()}
+          onChange={(e) => setState('param', e.target.value)}
+        />
 
-    </>)
+        <IconButton onClick={setOpen}>
+          <Shop />
+        </IconButton>
+
+      </Flex> 
+    </Box>
+  </>)
 }

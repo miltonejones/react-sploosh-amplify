@@ -38,7 +38,11 @@ class WindowManagerService$ {
       });
   }
   async launch(video, index = 0) {
-    await VideoPersistService.add(video);
+    try {
+      await VideoPersistService.add(video);
+    } catch (e) {
+      console.log ({ e })
+    }
     this.launched.push({
       video,
       index,
