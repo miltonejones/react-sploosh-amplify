@@ -168,7 +168,7 @@ export default function VideoCollection(props) {
     <Box  className="VideoCollection">
       <Box className="head">
         <Flex sx={{width: '100%'}}> 
-          <Box>
+          <Box sx={{whiteSpace: 'nowrap'}}>
             {count} videos 
           </Box>
           <StyledPagination
@@ -376,7 +376,7 @@ function useVideoCollection({
     setComponentState('selectedVideos', updated)
     setComponentState('candidateVideos', [])
     setComponentState('editMode', false)
-    setState(createdKey, records)
+    setState(createdKey, res)
   }
 
   const toggleEditMode = () => { 
@@ -433,20 +433,30 @@ function useVideoCollection({
     if (busy) return;
     if (loaded) return; 
     const createdKey = createKey();
-    const renew = searchKey !== createdKey;
+    const renew = searchKey !== createdKey;// || !response.records;
     
-    if (state[createKey]) return;
-
+    if (state[createdKey]) {
+      // setState('response', { ...state[createdKey] , searchKey: createdKey});
+      // setState('page', 1); 
+      // setState('searchKey', createdKey);
+      // refreshSelectedVideos(state[createdKey])
+      return console.log({exists: createdKey, records: state[createdKey]});
+    }
+    
     console.log({
       pageNum, 
+      renew,
       page, 
       param, 
       searchParam, 
-      searchKey
-    }, 
-    [createKey(), response.searchKey, renew.toString(), response]);
+      searchKey,
+      createdKey,
+      busy,
+      loaded,
+      response
+    });
 
-    (!!renew || !response.records) && load(pageNum, collectionType, searchParam);
+    !!renew && load(pageNum, collectionType, searchParam);
 
   }, [response, busy, pageNum, page, collectionType, type, param, searchParam]);
 

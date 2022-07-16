@@ -16,7 +16,7 @@ import {
   styled,
   InputAdornment
 } from '@mui/material';
-import { Close, Add, Refresh } from '@mui/icons-material';
+import { Close, Add, Refresh, ArrowForward } from '@mui/icons-material';
 import { findVideos } from '../../connector/DbConnector';
 import { addModelToVideo } from '../../connector/DbConnector';
 
@@ -115,7 +115,8 @@ export const StyledPagination = ({ totalPages, page, handleChange }) => {
     return <i />;
   }
   return (
-    <Pagination
+    <Flex>
+      <Pagination
       sx={{pt: 1}}
       color="primary"
       showFirstButton
@@ -126,6 +127,14 @@ export const StyledPagination = ({ totalPages, page, handleChange }) => {
       siblingCount={2}
       onChange={handleChange}
     />
+    <IconButton onClick={() => {
+      const num = prompt('Enter page number', page)
+      if (!num) return;
+      handleChange(null, num)
+    }}>
+      <ArrowForward />
+    </IconButton>
+    </Flex>
   );
 };
 
