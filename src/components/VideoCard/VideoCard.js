@@ -151,9 +151,9 @@ export default function VideoCard({
           <DeleteForever /> 
         </IconButton>}
 
-        <IconButton onClick={() => setShowMenu(false)} href={video.URL} target="_blank">
+        {!small && <IconButton onClick={() => setShowMenu(false)} href={video.URL} target="_blank">
           <Launch  /> 
-        </IconButton>
+        </IconButton>}
 
        {!!video.Key && !small && <>
         {!!onShop && <IconButton onClick={() => {
@@ -163,12 +163,12 @@ export default function VideoCard({
           <Search  /> 
         </IconButton>}
 
+       </>}
         <IconButton  
           onClick={() => setShowMenu(false)}
           href={`https://www.javlibrary.com/en/vl_searchbyid.php?keyword=${video.Key}`} target="_blank">
           <MenuBook  /> 
         </IconButton>
-       </>}
       </Flex>
 
       </CardMenu>

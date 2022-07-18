@@ -116,8 +116,7 @@ export const StyledPagination = ({ totalPages, page, handleChange }) => {
   }
   return (
     <Flex>
-      <Pagination
-      sx={{pt: 1}}
+      <Pagination 
       color="primary"
       showFirstButton
       showLastButton
