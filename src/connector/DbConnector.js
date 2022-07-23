@@ -9,9 +9,16 @@ export const getVideos = async (page) => {
   return await response.json();
 };
 
-export const getPhoto = async (name) => {
+export const getPhoto = async (name, retry) => {
   const response = await fetch(PHOTO_ENDPOINT + `/${name}`);
-  return await response.json();
+  const msg = await response.json();
+  if (msg?.src) {
+    return msg;
+  }
+  if (!retry) {
+    alert ('Retrying...')
+    return await getPhoto(name, true);
+  } 
 };
 
 export const getVideosByDomain = async (domain, page) => {

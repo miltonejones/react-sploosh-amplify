@@ -1,5 +1,6 @@
 import * as React from 'react';
 
+import useComponentState from '../../hooks/useComponentState';
 import DialogTitle from '@mui/material/DialogTitle';
 import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
@@ -7,29 +8,30 @@ import Avatar from '@mui/material/Avatar';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
+import Observer from '../../services/Observer';
+import dynamoStorage from '../../services/DynamoStorage';
+import ModelSelect from '../ModelSelect/ModelSelect';
 import { styled, Box, Menu, MenuItem, IconButton, Divider } from '@mui/material';
 import { MoreVert, Close, MenuBook, Shop, VideoLabel } from '@mui/icons-material';
 import { getModel } from '../../connector/DbConnector';
-import useComponentState from '../../hooks/useComponentState';
 import { VideoCard, StyledPagination, Flex, Tabs, Picture, TextBox, FabGroup, TextBoxes } from '../';
-import './ModelModal.css';
 import { addModelToVideo } from '../../connector/DbConnector';
 import { importComplete } from '../ShoppingDrawer/ShoppingDrawer';
 import { getModelMissingVideos } from '../../connector/DbConnector';
 import { getModelCostars } from '../../connector/DbConnector';
-import dynamoStorage from '../../services/DynamoStorage';
-import Observer from '../../services/Observer';
 import { toggleVideoFavorite } from '../../connector/DbConnector';
 import { saveVideo } from '../../connector/DbConnector';
 import { getVideoByURL } from '../../connector/ParserConnector';
 import { updateModelPhoto } from '../../connector/DbConnector';
-import ModelSelect from '../ModelSelect/ModelSelect';
 import { addModelAlias } from '../../connector/DbConnector';
 import { SplooshContext } from '../../hooks/useSploosh';
 import { quickSearch } from '../ShoppingDrawer/ShoppingDrawer';
 import { windowChange } from '../../services/WindowManager';
 import { useWindowManager } from '../../services/WindowManager';
 import { findVideos } from '../../connector/DbConnector';
+import { usePhotoModal, PhotoModal } from '..';
+import { getPhoto } from '../../connector/DbConnector';
+import './ModelModal.css';
 
 
 
@@ -121,15 +123,15 @@ const ModelMenu = ({models, aliases, currentAction, open, anchorEl, onClose, sel
       {star.alias}</MenuItem>)} 
 
   <Divider />
-    <Typography ml={1} variant="caption">actions</Typography>
+    
+  <Typography ml={1} variant="caption">actions</Typography>
 
     {actions.map((action, i) => <MenuItem
       disabled={currentAction === i + 1}
       onClick={() => onAction && onAction(i + 1)}
-      key={action.label}  >
-      
-      {action.label}</MenuItem>)} 
-
+      key={action.label} >
+      {action.label}
+    </MenuItem>)} 
 
 </Menu>
 }
@@ -177,7 +179,11 @@ export default function ModelModal(props) {
 
   const WindowManager = useWindowManager()
   const [windowLength, setWindowLength] = React.useState(0)
-  const {  setModelList, getModelList } = useModelList()
+  const {  setModelList, getModelList } = useModelList();
+
+  
+  const modal = usePhotoModal();
+
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
@@ -450,6 +456,20 @@ export default function ModelModal(props) {
   ]
  
 
+  const findPhoto = async (star) => {
+    const photo = await getPhoto(star.name);
+    if (photo.src) {
+      const ok = await modal.showPhoto(photo);
+      if (ok) { 
+        await updateModelPhoto(star.ID, ok); 
+        loadModel(currentId, 1);
+        importComplete.next();
+      }
+      return;
+    } 
+    alert (JSON.stringify(photo))
+  }
+
   return (
     <Dialog
       classes={{ paper: 'model-modal' }}
@@ -458,7 +478,7 @@ export default function ModelModal(props) {
     >
       <DialogTitle sx={{pb: 0, pt: 1, pl: 1, pr: 0}}>
         <Flex mr={2}>
-          {!!model.image && <Avatar variant="rounded" onClick={()=>alert( model.ID )} src={fixPhoto(model.image)} alt={model.name} />}
+          {!!model.image && <Avatar variant="rounded" onClick={()=>findPhoto( model )} src={fixPhoto(model.image)} alt={model.name} />}
           <Stack ml={2}>
             <Typography variant="body1">{model.name}</Typography>
             <Typography variant="caption">{videos.count} videos </Typography>
@@ -580,6 +600,7 @@ export default function ModelModal(props) {
         buttons={dialogButtons}
       />
       </DialogContent>
+      <PhotoModal {...modal.photoModalState} />
     </Dialog>
   );
 }
