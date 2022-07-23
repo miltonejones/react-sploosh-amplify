@@ -60,6 +60,7 @@ export default function VideoCard({
   onDrop, 
   onHeart, 
   onModel,
+  onPhoto,
   selected, 
   readonly,
   onShop,
@@ -181,6 +182,7 @@ export default function VideoCard({
               <Circle
                 src={video.models[0].image}
                 alt={video.models[0].Name}
+                onClick={() => onPhoto && onPhoto(video.models[0])}
               />
             )}
             <Typography
@@ -261,12 +263,12 @@ const useImageLoader = (src) => {
   return { source }
 }
 
-const Circle = ({src, alt}) => {
+const Circle = ({src, alt, ...props}) => {
   const { source } = useImageLoader(src) 
   if (!source) {
-    return <Avatar>{alt.substr(0, 1)}</Avatar>
+    return <Avatar {...props}>{alt.substr(0, 1)}</Avatar>
   }
-  return <Avatar src={source} alt={alt} />
+  return <Avatar src={source} alt={alt} {...props}/>
 }
 
 const ModelName = ({Name, image}) => {

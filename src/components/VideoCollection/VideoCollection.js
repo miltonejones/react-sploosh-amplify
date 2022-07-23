@@ -11,7 +11,8 @@ import {
   getVideoKeys,
   getFavorites,
   toggleVideoFavorite ,
-  deleteVideo
+  deleteVideo,
+  getPhoto
 } from '../../connector/DbConnector';
 import {
   VideoCard,
@@ -21,7 +22,9 @@ import {
   StyledPagination,
   Spacer, 
   SystemDialog, 
-  useSystemDialog 
+  useSystemDialog ,
+  PhotoModal, 
+  usePhotoModal
 } from '../';
 import { TextField, Box, Button, IconButton, Badge, Snackbar,
   Stack,
@@ -37,6 +40,7 @@ import { importComplete } from '../ShoppingDrawer/ShoppingDrawer';
 import { quickSearch } from '../ShoppingDrawer/ShoppingDrawer';
 import { getVideosByDomain } from '../../connector/DbConnector';
 import { getModelsByTitle } from '../../connector/DbConnector';
+import { updateModelPhoto } from '../../connector/DbConnector';
 
 
 
@@ -72,7 +76,8 @@ export default function VideoCollection(props) {
   const WindowManager = useWindowManager()
   const { count, records } = response;
   const [windowLength, setWindowLength] = React.useState(0)
-  const [snackProps, setSnackProps] = React.useState({value: 0})
+  const [snackProps, setSnackProps] = React.useState({value: 0});
+  const modal = usePhotoModal();
   React.useEffect(() => {
     const sub = windowChange.subscribe(on => {
       console.log ({ sub }); 
@@ -102,6 +107,7 @@ export default function VideoCollection(props) {
   const iconClass = busy ? 'spin' : '';
   if (!records) return 'Loading...' + collectionType;
   const totalPages = Math.ceil(count / 30);
+
 
   const add = async () => {
 
@@ -163,6 +169,19 @@ export default function VideoCollection(props) {
 
   const fabButtons = (!!windowLength ? windowButtons : []).concat(editButtons);
 
+  const findPhoto = async (star) => {
+    const photo = await getPhoto(star.Name);
+    if (photo.src) {
+      const ok = await modal.showPhoto(photo);
+      if (ok) { 
+        await updateModelPhoto(star.ID, ok);
+        refreshList && refreshList()
+      }
+      return;
+    } 
+    alert (JSON.stringify(photo))
+  }
+
   return (
     <>
     <Box  className="VideoCollection">
@@ -193,6 +212,7 @@ export default function VideoCollection(props) {
               getModel={(q) => {
                 showDialog(q);
               }}
+              onPhoto={findPhoto}
               onModel={onModel}
               onHeart={onHeart}
               onDrop={onDrop}
@@ -217,6 +237,7 @@ export default function VideoCollection(props) {
         icon={<Add />}
         buttons={fabButtons}
       />
+      <PhotoModal {...modal.photoModalState} />
       <VideoDrawer onClose={closeVideoPanel} refreshList={refreshList}  />
       <ProgressSnackbar {...snackProps} />
     </>
