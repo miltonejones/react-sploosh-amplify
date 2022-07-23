@@ -1,6 +1,7 @@
 import VideoCard, { Spacer, Shorten } from './VideoCard/VideoCard';
 import RegionMenu from './RegionMenu/RegionMenu';
 import ModelModal, { useModelModal } from './ModelModal/ModelModal';
+import { PhotoModal, usePhotoModal } from './PhotoModal/PhotoModal';
 import VideoCollection from './VideoCollection/VideoCollection';
 import SearchDrawer from './SearchDrawer/SearchDrawer';
 import VideoDrawer from './VideoDrawer/VideoDrawer';
@@ -30,6 +31,8 @@ export {
   ModelModal,
   useModelModal,
   Flex,
+  PhotoModal,  
+  usePhotoModal,
   Spacer,
   Shorten,
   StyledPagination,

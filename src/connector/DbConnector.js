@@ -2,9 +2,15 @@ import React from 'react';
 import { getVideoByURL } from './ParserConnector';
 
 const API_ENDPOINT = 'https://3bax4cg6w7.execute-api.us-east-1.amazonaws.com';
+const PHOTO_ENDPOINT = 'https://58uf2seho0.execute-api.us-east-1.amazonaws.com';
 
 export const getVideos = async (page) => {
   const response = await fetch(API_ENDPOINT + `/videos/${page}`);
+  return await response.json();
+};
+
+export const getPhoto = async (name) => {
+  const response = await fetch(PHOTO_ENDPOINT + `/${name}`);
   return await response.json();
 };
 
