@@ -17,15 +17,25 @@ class WindowManagerService$ {
       const str = `embed/${regex[1]}/${regex[2]}/${re.width}/${re.height}`;
       out = out.replace(regex[0], str);
     }
-  //  out = out.replace('https://player.javdisk.com/embed.html', 'https://javdoe.to/player')
+ 
     return out;
   }
+
+  javdoeCustom(video, w, h) {
+    return video.URL + `#${w}/${h}`
+  }
+
   region(video, index = 0) {
     const re = WINDOW_REGIONS[index % WINDOW_REGIONS.length];
     re.on = !0;
     re.src = video.image;
+
+    const address = video.URL?.indexOf('javdoe.to') > 0 
+      ? this.javdoeCustom(video, re.width, re.height)
+      : this.quickSize(re, video.src);
+      
     return window.open(
-      this.quickSize(re, video.src),
+      address,
       `region_${index}`,
       `width=${re.width},height=${re.height},toolbar=0,location=0,left=${re.x},top=${re.y}`
     );
